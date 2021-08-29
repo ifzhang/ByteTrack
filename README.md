@@ -33,6 +33,7 @@ ln -s /path/to/your/mot ./datasets/mot
 
 
 <summary>Prepare pretrained models</summary>
+
 ```shell
 cd <MOTX_HOME>
 mkdir pretrained
