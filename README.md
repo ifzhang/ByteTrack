@@ -63,7 +63,7 @@ python3 tools/track_motdt.py -f exps/example/mot/yolox_x_ch_150.py -c pretrained
 ```
 
 <summary>Train on CrowdHuman</summary>
-Mix crowdhuman_train and crowdhuman_val and put the crowdhuman folder under <MOTX_HOME>/datasets.
+Mix crowdhuman_train and crowdhuman_val and put the crowdhuman folder under datasets.
 
 ```shell
 cd <MOTX_HOME>
