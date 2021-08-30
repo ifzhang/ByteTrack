@@ -10,4 +10,4 @@ Step3. run
 
 
 ## Notes
-tracker motion + reid
+tracker: motion + reid
