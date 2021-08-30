@@ -122,25 +122,26 @@ class Tracker(object):
         # second association
         results_second = [item for item in results_with_low if item['score'] < self.opt.track_thresh]
         
-        tracks_second = [self.tracks[i] for i in unmatched_tracks if self.tracks[i]['active'] > 0]
-                
+        self_tracks_second = [self.tracks[i] for i in unmatched_tracks if self.tracks[i]['active'] > 0]
+        second2original = [i for i in unmatched_tracks if self.tracks[i]['active'] > 0]
+        
         N = len(results_second)
-        M = len(tracks_second)
+        M = len(self_tracks_second)
         
         if N > 0 and M > 0:
             dets = np.array(
                 [det['ct'] + det['tracking'] for det in results_second], np.float32)  # N x 2
             track_size = np.array([((track['bbox'][2] - track['bbox'][0]) * \
                                     (track['bbox'][3] - track['bbox'][1])) \
-                                   for track in tracks_second], np.float32)  # M
-            track_cat = np.array([track['class'] for track in tracks_second], np.int32)  # M
+                                   for track in self_tracks_second], np.float32)  # M
+            track_cat = np.array([track['class'] for track in self_tracks_second], np.int32)  # M
             item_size = np.array([((item['bbox'][2] - item['bbox'][0]) * \
                                    (item['bbox'][3] - item['bbox'][1])) \
                                   for item in results_second], np.float32)  # N
             item_cat = np.array([item['class'] for item in results_second], np.int32)  # N
-            tracks = np.array(
-                [pre_det['ct'] for pre_det in tracks_second], np.float32)  # M x 2
-            dist = (((tracks.reshape(1, -1, 2) - \
+            tracks_second = np.array(
+                [pre_det['ct'] for pre_det in self_tracks_second], np.float32)  # M x 2
+            dist = (((tracks_second.reshape(1, -1, 2) - \
                       dets.reshape(-1, 1, 2)) ** 2).sum(axis=2))  # N x M
 
             invalid = ((dist > track_size.reshape(1, M)) + \
@@ -148,21 +149,26 @@ class Tracker(object):
                        (item_cat.reshape(N, 1) != track_cat.reshape(1, M))) > 0
             dist = dist + invalid * 1e18
             
-            matched_indices_second = greedy_assignment(copy.deepcopy(dist))
+            matched_indices_second = greedy_assignment(copy.deepcopy(dist), 1e8)
             
             unmatched_tracks_second = [d for d in range(tracks_second.shape[0]) \
-                                       if not (d in matched_indices[:, 1])]        
+                                       if not (d in matched_indices_second[:, 1])]        
             matches_second = matched_indices_second
             
             for m in matches_second:
                 track = results_second[m[0]]
-                track['tracking_id'] = tracks_second[m[1]]['tracking_id']
+                track['tracking_id'] = self_tracks_second[m[1]]['tracking_id']
                 track['age'] = 1
-                track['active'] = tracks_second[m[1]]['active'] + 1
+                track['active'] = self_tracks_second[m[1]]['active'] + 1
                 ret.append(track)
-        
-            unmatched_tracks = [i for i_ind, i in enumerate(unmatched_tracks) if i_ind in unmatched_tracks_second]
-        
+                        
+            unmatched_tracks = [second2original[i] for i in unmatched_tracks_second] + \
+            [i for i in unmatched_tracks if self.tracks[i]['active'] == 0]
+
+#.      for debug        
+#         unmatched_tracks = [i for i in unmatched_tracks if self.tracks[i]['active'] > 0] + \
+#         [i for i in unmatched_tracks if self.tracks[i]['active'] == 0]
+    
         for i in unmatched_tracks:
             track = self.tracks[i]
             if track['age'] < self.opt.max_age:
@@ -180,13 +186,13 @@ class Tracker(object):
         return ret
 
 
-def greedy_assignment(dist):
+def greedy_assignment(dist, thresh=1e16):
     matched_indices = []
     if dist.shape[1] == 0:
         return np.array(matched_indices, np.int32).reshape(-1, 2)
     for i in range(dist.shape[0]):
         j = dist[i].argmin()
-        if dist[i][j] < 1e16:
+        if dist[i][j] < thresh:
             dist[:, j] = 1e18
             matched_indices.append([i, j])
     return np.array(matched_indices, np.int32).reshape(-1, 2)
