@@ -22,7 +22,7 @@ from models.utils import _tranpose_and_gather_feat
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
-    def __init__(self, tlwh, score, temp_feat, buffer_size=30):
+    def __init__(self, tlwh, score):
 
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=np.float)
@@ -31,23 +31,7 @@ class STrack(BaseTrack):
         self.is_activated = False
 
         self.score = score
-        self.score_list = []
         self.tracklet_len = 0
-
-        self.smooth_feat = None
-        self.update_features(temp_feat)
-        self.features = deque([], maxlen=buffer_size)
-        self.alpha = 0.9
-
-    def update_features(self, feat):
-        feat /= np.linalg.norm(feat)
-        self.curr_feat = feat
-        if self.smooth_feat is None:
-            self.smooth_feat = feat
-        else:
-            self.smooth_feat = self.alpha * self.smooth_feat + (1 - self.alpha) * feat
-        self.features.append(feat)
-        self.smooth_feat /= np.linalg.norm(self.smooth_feat)
 
     def predict(self):
         mean_state = self.mean.copy()
@@ -81,14 +65,12 @@ class STrack(BaseTrack):
         #self.is_activated = True
         self.frame_id = frame_id
         self.start_frame = frame_id
-        self.score_list.append(self.score)
 
     def re_activate(self, new_track, frame_id, new_id=False):
         self.mean, self.covariance = self.kalman_filter.update(
             self.mean, self.covariance, self.tlwh_to_xyah(new_track.tlwh)
         )
 
-        self.update_features(new_track.curr_feat)
         self.tracklet_len = 0
         self.state = TrackState.Tracked
         self.is_activated = True
@@ -96,9 +78,8 @@ class STrack(BaseTrack):
         if new_id:
             self.track_id = self.next_id()
         self.score = new_track.score
-        self.score_list.append(self.score)
 
-    def update(self, new_track, frame_id, update_feature=True):
+    def update(self, new_track, frame_id):
         """
         Update a matched track
         :type new_track: STrack
@@ -116,9 +97,6 @@ class STrack(BaseTrack):
         self.is_activated = True
 
         self.score = new_track.score
-        self.score_list.append(self.score)
-        if update_feature:
-            self.update_features(new_track.curr_feat)
 
     @property
     # @jit(nopython=True)
@@ -251,44 +229,24 @@ class JDETracker(object):
             output = self.model(im_blob)[-1]
             hm = output['hm'].sigmoid_()
             wh = output['wh']
-            id_feature = output['id']
-            id_feature = F.normalize(id_feature, dim=1)
 
             reg = output['reg'] if self.opt.reg_offset else None
             dets, inds = mot_decode(hm, wh, reg=reg, ltrb=self.opt.ltrb, K=self.opt.K)
-            id_feature = _tranpose_and_gather_feat(id_feature, inds)
-            id_feature = id_feature.squeeze(0)
-            id_feature = id_feature.cpu().numpy()
 
         dets = self.post_process(dets, meta)
         dets = self.merge_outputs([dets])[1]
 
         remain_inds = dets[:, 4] > self.opt.conf_thres
         inds_low = dets[:, 4] > 0.2
-        #inds_low = dets[:, 4] > self.opt.conf_thres
         inds_high = dets[:, 4] < self.opt.conf_thres
         inds_second = np.logical_and(inds_low, inds_high)
         dets_second = dets[inds_second]
-        id_feature_second = id_feature[inds_second]
         dets = dets[remain_inds]
-        id_feature = id_feature[remain_inds]
-
-        # vis
-        '''
-        for i in range(0, dets.shape[0]):
-            bbox = dets[i][0:4]
-            cv2.rectangle(img0, (bbox[0], bbox[1]),
-                          (bbox[2], bbox[3]),
-                          (0, 255, 0), 2)
-        cv2.imshow('dets', img0)
-        cv2.waitKey(0)
-        id0 = id0-1
-        '''
 
         if len(dets) > 0:
             '''Detections'''
-            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4], f, 30) for
-                          (tlbrs, f) in zip(dets[:, :5], id_feature)]
+            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4]) for
+                          tlbrs in dets[:, :5]]
         else:
             detections = []
 
@@ -301,14 +259,11 @@ class JDETracker(object):
             else:
                 tracked_stracks.append(track)
 
-        ''' Step 2: First association, with embedding'''
+        ''' Step 2: First association, with IOU'''
         strack_pool = joint_stracks(tracked_stracks, self.lost_stracks)
         # Predict the current location with KF
         STrack.multi_predict(strack_pool)
-        #dists = matching.embedding_distance(strack_pool, detections)
-        #dists = matching.fuse_iou(dists, strack_pool, detections)
         dists = matching.iou_distance(strack_pool, detections)
-        #dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
         matches, u_track, u_detection = matching.linear_assignment(dists, thresh=self.opt.match_thres)
 
         for itracked, idet in matches:
@@ -321,34 +276,18 @@ class JDETracker(object):
                 track.re_activate(det, self.frame_id, new_id=False)
                 refind_stracks.append(track)
 
-        ''' Step 3: Second association, with IOU'''
-        detections = [detections[i] for i in u_detection]
-        r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
-        dists = matching.iou_distance(r_tracked_stracks, detections)
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.5)
-
-        for itracked, idet in matches:
-            track = r_tracked_stracks[itracked]
-            det = detections[idet]
-            if track.state == TrackState.Tracked:
-                track.update(det, self.frame_id)
-                activated_starcks.append(track)
-            else:
-                track.re_activate(det, self.frame_id, new_id=False)
-                refind_stracks.append(track)
-
         # association the untrack to the low score detections
         if len(dets_second) > 0:
             '''Detections'''
-            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4], f, 30) for
-                          (tlbrs, f) in zip(dets_second[:, :5], id_feature_second)]
+            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4]) for
+                                 tlbrs in dets_second[:, :5]]
         else:
             detections_second = []
-        second_tracked_stracks = [r_tracked_stracks[i] for i in u_track if r_tracked_stracks[i].state == TrackState.Tracked]
-        dists = matching.iou_distance(second_tracked_stracks, detections_second)
+        r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
+        dists = matching.iou_distance(r_tracked_stracks, detections_second)
         matches, u_track, u_detection_second = matching.linear_assignment(dists, thresh=0.4)
         for itracked, idet in matches:
-            track = second_tracked_stracks[itracked]
+            track = r_tracked_stracks[itracked]
             det = detections_second[idet]
             if track.state == TrackState.Tracked:
                 track.update(det, self.frame_id)
@@ -358,8 +297,7 @@ class JDETracker(object):
                 refind_stracks.append(track)
 
         for it in u_track:
-            #track = r_tracked_stracks[it]
-            track = second_tracked_stracks[it]
+            track = r_tracked_stracks[it]
             if not track.state == TrackState.Lost:
                 track.mark_lost()
                 lost_stracks.append(track)
