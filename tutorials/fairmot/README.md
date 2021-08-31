@@ -7,6 +7,8 @@ Step2. replace https://github.com/ifzhang/FairMOT/blob/master/src/lib/tracker/mu
 
 
 Step3. run motion + reid tracker using tracker.py (set --match_thres 0.4), run motion tracker using motion_tracker.py (set --match_thres 0.8)
+
+run motion tracker example: 
 ```
 python3 track_half.py mot --load_model ../exp/mot/mot17_half_dla34/model_last.pth --match_thres 0.8
 ```
