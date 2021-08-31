@@ -1,4 +1,3 @@
-
 from collections import deque
 import torch
 import numpy as np
@@ -11,7 +10,7 @@ from .basetrack import BaseTrack, TrackState
 
 class STrack(BaseTrack):
 
-    def __init__(self, tlwh, score, temp_feat, buffer_size=30):
+    def __init__(self, tlwh, score):
 
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=np.float)
@@ -21,21 +20,6 @@ class STrack(BaseTrack):
 
         self.score = score
         self.tracklet_len = 0
-
-        self.smooth_feat = None
-        self.update_features(temp_feat)
-        self.features = deque([], maxlen=buffer_size)
-        self.alpha = 0.9
-    
-    def update_features(self, feat):
-        feat /= np.linalg.norm(feat)
-        self.curr_feat = feat 
-        if self.smooth_feat is None:
-            self.smooth_feat = feat
-        else:
-            self.smooth_feat = self.alpha *self.smooth_feat + (1-self.alpha) * feat
-        self.features.append(feat)
-        self.smooth_feat /= np.linalg.norm(self.smooth_feat)
 
     def predict(self):
         mean_state = self.mean.copy()
@@ -74,7 +58,6 @@ class STrack(BaseTrack):
             self.mean, self.covariance, self.tlwh_to_xyah(new_track.tlwh)
         )
 
-        self.update_features(new_track.curr_feat)
         self.tracklet_len = 0
         self.state = TrackState.Tracked
         self.is_activated = True
@@ -100,8 +83,6 @@ class STrack(BaseTrack):
         self.is_activated = True
 
         self.score = new_track.score
-        if update_feature:
-            self.update_features(new_track.curr_feat)
 
     @property
     def tlwh(self):
@@ -224,8 +205,8 @@ class JDETracker(object):
             dets_second = dets[inds_second]
             dets = dets[remain_inds]
 
-            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4], f, 30) for
-                          (tlbrs, f) in zip(dets[:, :5], dets[:, 6:])]
+            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4]) for
+                          tlbrs in dets[:, :5]]
         else:
             detections = []
             dets_second = []
@@ -250,12 +231,9 @@ class JDETracker(object):
         strack_pool = joint_stracks(tracked_stracks, self.lost_stracks)
         # Predict the current location with KF
         STrack.multi_predict(strack_pool, self.kalman_filter)
-
-        #dists = matching.embedding_distance(strack_pool, detections)
-        #dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
         dists = matching.iou_distance(strack_pool, detections)
         # The dists is the list of distances of the detection with the tracks in strack_pool
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=self.opt.match_thres)
+        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.8)
         # The matches is the array for corresponding matches of the detection with the corresponding strack_pool
 
         for itracked, idet in matches:
@@ -271,40 +249,17 @@ class JDETracker(object):
                 track.re_activate(det, self.frame_id, new_id=False)
                 refind_stracks.append(track)
 
-        # None of the steps below happen if there are no undetected tracks.
-        ''' Step 3: Second association, with IOU'''
-        detections = [detections[i] for i in u_detection]
-        # detections is now a list of the unmatched detections
-        r_tracked_stracks = [] # This is container for stracks which were tracked till the
-        # previous frame but no detection was found for it in the current frame
-        for i in u_track:
-            if strack_pool[i].state == TrackState.Tracked:
-                r_tracked_stracks.append(strack_pool[i])
-        dists = matching.iou_distance(r_tracked_stracks, detections)
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.5)
-        # matches is the list of detections which matched with corresponding tracks by IOU distance method
-        for itracked, idet in matches:
-            track = r_tracked_stracks[itracked]
-            det = detections[idet]
-            if track.state == TrackState.Tracked:
-                track.update(det, self.frame_id)
-                activated_starcks.append(track)
-            else:
-                track.re_activate(det, self.frame_id, new_id=False)
-                refind_stracks.append(track)
-        # Same process done for some unmatched detections, but now considering IOU_distance as measure
-
         # association the untrack to the low score detections
         if len(dets_second) > 0:
-            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4], f, 30) for
-                                 (tlbrs, f) in zip(dets_second[:, :5], dets_second[:, 6:])]
+            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4]) for
+                                 tlbrs in dets_second[:, :5]]
         else:
             detections_second = []
-        second_tracked_stracks = [r_tracked_stracks[i] for i in u_track if r_tracked_stracks[i].state == TrackState.Tracked]
-        dists = matching.iou_distance(second_tracked_stracks, detections_second)
+        r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
+        dists = matching.iou_distance(r_tracked_stracks, detections_second)
         matches, u_track, u_detection_second = matching.linear_assignment(dists, thresh=0.4)
         for itracked, idet in matches:
-            track = second_tracked_stracks[itracked]
+            track = r_tracked_stracks[itracked]
             det = detections_second[idet]
             if track.state == TrackState.Tracked:
                 track.update(det, self.frame_id)
@@ -314,7 +269,7 @@ class JDETracker(object):
                 refind_stracks.append(track)
 
         for it in u_track:
-            track = second_tracked_stracks[it]
+            track = r_tracked_stracks[it]
             if not track.state == TrackState.Lost:
                 track.mark_lost()
                 lost_stracks.append(track)
