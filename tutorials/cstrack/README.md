@@ -10,9 +10,9 @@ Step3. run
 
 
 ## Notes
-cstrack: only motion
+motion_tracker: only motion
 
-cstrack_new: motion + reid
+tracker: motion + reid
 
 
 
