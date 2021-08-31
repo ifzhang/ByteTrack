@@ -10,4 +10,5 @@ Step3. run motion + reid tracker using tracker.py (set --match_thres 0.4), run m
 
 
 ## Notes
+motion_tracker: motion
 tracker: motion + reid
