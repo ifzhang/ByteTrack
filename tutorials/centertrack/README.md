@@ -36,7 +36,7 @@ python3 test.py tracking --exp_id mot17_half --dataset mot --dataset_version 17h
 
 
 ## Notes
-tracker: only motion
+tracker.py: only motion
 
-tracker: motion with kalman filter
+tracker_kalman.py: motion with kalman filter
 
