@@ -255,7 +255,7 @@ class JDETracker(object):
         dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
         #dists = matching.iou_distance(strack_pool, detections)
         # The dists is the list of distances of the detection with the tracks in strack_pool
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=self.opt.match_thres)
+        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.7)
         # The matches is the array for corresponding matches of the detection with the corresponding strack_pool
 
         for itracked, idet in matches:
