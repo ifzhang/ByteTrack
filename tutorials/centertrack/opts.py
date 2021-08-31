@@ -212,6 +212,8 @@ class opts(object):
     self.parser.add_argument('--fp_disturb', type=float, default=0)
     self.parser.add_argument('--pre_thresh', type=float, default=-1)
     self.parser.add_argument('--track_thresh', type=float, default=0.3)
+    self.parser.add_argument('--match_thresh', type=float, default=0.8)
+    self.parser.add_argument('--track_buffer', type=int, default=30)    
     self.parser.add_argument('--new_thresh', type=float, default=0.3)
     self.parser.add_argument('--max_frame_dist', type=int, default=3)
     self.parser.add_argument('--ltrb_amodal', action='store_true')
