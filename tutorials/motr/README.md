@@ -9,7 +9,6 @@ replace https://github.com/megvii-model/MOTR/blob/main/util/evaluation.py
 
 replace https://github.com/megvii-model/MOTR/blob/main/eval.py
 
-add 
 
 Step3. run motion tracker example:
 
