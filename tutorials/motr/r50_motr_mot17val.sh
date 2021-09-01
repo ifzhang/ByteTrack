@@ -5,7 +5,6 @@
 # Copyright (c) 2020 SenseTime. All Rights Reserved.
 # ------------------------------------------------------------------------
 
-EXP_DIR=exps/e2e_motr_r50_mot17val
 python3 eval.py \
     --meta_arch motr \
     --dataset_file e2e_joint \
@@ -14,8 +13,8 @@ python3 eval.py \
     --lr_drop 100 \
     --lr 2e-4 \
     --lr_backbone 2e-5 \
-    --pretrained ${EXP_DIR}/motr_final.pth \
-    --output_dir ${EXP_DIR} \
+    --pretrained exps/e2e_motr_r50_mot17val/motr_final.pth \
+    --output_dir exps/e2e_motr_r50_mot17val \
     --batch_size 1 \
     --sample_mode 'random_interval' \
     --sample_interval 10 \
