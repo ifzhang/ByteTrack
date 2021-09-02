@@ -45,6 +45,8 @@ import shutil
 
 from detectron2.structures import Instances
 
+from tracker import DETTracker
+
 np.random.seed(2020)
 
 COLORS_10 = [(144, 238, 144), (178, 34, 34), (221, 160, 221), (0, 255, 0), (0, 128, 0), (210, 105, 30), (220, 20, 60),
@@ -148,10 +150,23 @@ class Track(object):
         self.box = box
         self.clear_miss()
 
+        
+def write_results(filename, results):
+    save_format = '{frame},{id},{x1},{y1},{w},{h},{s},-1,-1,-1\n'
+    with open(filename, 'w') as f:
+        for frame_id, tlwhs, track_ids, scores in results:
+            for tlwh, track_id, score in zip(tlwhs, track_ids, scores):
+                if track_id < 0:
+                    continue
+                x1, y1, w, h = tlwh
+                line = save_format.format(frame=frame_id, id=track_id, x1=round(x1, 1), y1=round(y1, 1), w=round(w, 1), h=round(h, 1), s=round(score, 2))
+                f.write(line)
+    logger.info('save results to {}'.format(filename))
+
 
 class MOTR(object):
     def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3):
-        pass
+        self.tracker = DETTracker()
 
     def update(self, dt_instances: Instances):
         ret = []
@@ -163,8 +178,17 @@ class MOTR(object):
                 ret.append(np.concatenate((box_with_score, [id + 1])).reshape(1, -1))  # +1 as MOT benchmark requires positive
 
         if len(ret) > 0:
-            return np.concatenate(ret)
+            online_targets = self.tracker.update(np.concatenate(ret))
+            
+            online_ret = []
+            for t in online_targets:
+                online_ret.append(np.array([t.tlbr[0], t.tlbr[1], t.tlbr[2], t.tlbr[3], t.score, t.track_id]).reshape(1, -1))
+
+            if len(online_ret) > 0:
+                return np.concatenate(online_ret)
+        
         return np.empty((0, 6))
+        
 
 
 def load_label(label_path: str, img_size: tuple) -> dict:
@@ -349,13 +373,13 @@ class Detector(object):
             img_show = draw_bboxes(img, np.concatenate([dt_instances.boxes, dt_instances.scores.reshape(-1, 1)], axis=-1), dt_instances.obj_idxes)
         else:
             img_show = draw_bboxes(img, dt_instances.boxes, dt_instances.obj_idxes)
-        if ref_pts is not None:
-            img_show = draw_points(img_show, ref_pts)
-        if gt_boxes is not None:
-            img_show = draw_bboxes(img_show, gt_boxes, identities=np.ones((len(gt_boxes), )) * -1)
+#         if ref_pts is not None:
+#             img_show = draw_points(img_show, ref_pts)
+#         if gt_boxes is not None:
+#             img_show = draw_bboxes(img_show, gt_boxes, identities=np.ones((len(gt_boxes), )) * -1)
         cv2.imwrite(img_path, img_show)
 
-    def detect(self, prob_threshold=0.7, area_threshold=100, vis=False):
+    def detect(self, prob_threshold=0.8, area_threshold=100, vis=False):
         total_dts = 0
         track_instances = None
         max_id = 0
@@ -387,11 +411,12 @@ class Detector(object):
 
             if vis:
                 # for visual
-                cur_vis_img_path = os.path.join(self.save_path, 'frame_{}.jpg'.format(i))
+                cur_vis_img_path = os.path.join(self.save_path, 'frame_{:0>8d}.jpg'.format(i))
                 gt_boxes = None
                 self.visualize_img_with_bbox(cur_vis_img_path, ori_img, dt_instances, ref_pts=all_ref_pts, gt_boxes=gt_boxes)
 
             tracker_outputs = self.tr_tracker.update(dt_instances)
+            
             self.write_results(txt_path=os.path.join(self.predict_path, 'gt.txt'),
                                frame_id=(i + 1),
                                bbox_xyxy=tracker_outputs[:, :4],
