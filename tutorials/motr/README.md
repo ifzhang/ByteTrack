@@ -13,6 +13,10 @@ replace https://github.com/megvii-model/MOTR/blob/main/datasets/joint.py
 
 replace https://github.com/megvii-model/MOTR/blob/main/datasets/transforms.py
 
+add tracker.py to https://github.com/megvii-model/MOTR
+
+add mot_online to https://github.com/megvii-model/MOTR
+
 
 Step3. run motion tracker example:
 
