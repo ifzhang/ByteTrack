@@ -222,7 +222,7 @@ class Tracker(object):
         STrack.multi_predict(strack_pool)
         dists = matching.iou_distance(strack_pool, detections)
         #dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=self.args.match_thresh)
+        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.9)
 
         for itracked, idet in matches:
             track = strack_pool[itracked]
@@ -243,7 +243,7 @@ class Tracker(object):
             detections_second = []
         r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
         dists = matching.iou_distance(r_tracked_stracks, detections_second)
-        matches, u_track, u_detection_second = matching.linear_assignment(dists, thresh=0.5)
+        matches, u_track, u_detection_second = matching.linear_assignment(dists, thresh=0.4)
         for itracked, idet in matches:
             track = r_tracked_stracks[itracked]
             det = detections_second[idet]
@@ -351,15 +351,3 @@ def remove_duplicate_stracks(stracksa, stracksb):
     resa = [t for i, t in enumerate(stracksa) if not i in dupa]
     resb = [t for i, t in enumerate(stracksb) if not i in dupb]
     return resa, resb
-
-
-def remove_fp_stracks(stracksa, n_frame=10):
-    remain = []
-    for t in stracksa:
-        score_5 = t.score_list[-n_frame:]
-        score_5 = np.array(score_5, dtype=np.float32)
-        index = score_5 < 0.45
-        num = np.sum(index)
-        if num < n_frame:
-            remain.append(t)
-    return remain
