@@ -175,6 +175,13 @@ class Tracker(object):
         M = len(self_tracks_second)
         
         if N > 0 and M > 0:
+
+            track_boxes_second = np.array([[track['bbox'][0], track['bbox'][1],
+                                 track['bbox'][2], track['bbox'][3]] for track in self_tracks_second], np.float32)  # M x 4
+            det_boxes_second = np.array([[item['bbox'][0], item['bbox'][1],
+                                  item['bbox'][2], item['bbox'][3]] for item in results_second], np.float32)  # N x 4
+            box_ious_second = self.bbox_overlaps_py(det_boxes_second, track_boxes_second)
+
             dets = np.array(
                 [det['ct'] + det['tracking'] for det in results_second], np.float32)  # N x 2
             track_size = np.array([((track['bbox'][2] - track['bbox'][0]) * \
@@ -192,13 +199,12 @@ class Tracker(object):
 
             invalid = ((dist > track_size.reshape(1, M)) + \
                        (dist > item_size.reshape(N, 1)) + \
-                       (item_cat.reshape(N, 1) != track_cat.reshape(1, M))) > 0
+                       (item_cat.reshape(N, 1) != track_cat.reshape(1, M)) + (box_ious_second < 0.3)) > 0
             dist = dist + invalid * 1e18
             
             matched_indices_second = greedy_assignment(copy.deepcopy(dist), 1e8)
-            
             unmatched_tracks_second = [d for d in range(tracks_second.shape[0]) \
-                                       if not (d in matched_indices_second[:, 1])]        
+                                       if not (d in matched_indices_second[:, 1])]                        
             matches_second = matched_indices_second            
             
             for m in matches_second:
