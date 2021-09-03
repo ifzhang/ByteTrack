@@ -92,6 +92,6 @@ python3 eval.py \
 
 # MOTR det
 
-in step2, replace https://github.com/megvii-model/MOTR/blob/main/models/motr.py by motr2.py 
+in Step2, replace https://github.com/megvii-model/MOTR/blob/main/models/motr.py by motr_det.py 
 
 others are the same as MOTR
