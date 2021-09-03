@@ -153,7 +153,7 @@ class DETTracker(object):
         self.frame_id = 0
         
         self.low_thresh = 0.2
-        self.track_thresh = 0.6
+        self.track_thresh = 0.8
         self.det_thresh = self.track_thresh + 0.1
         
         
@@ -170,7 +170,7 @@ class DETTracker(object):
 
 #         output_results = output_results.cpu().numpy()
 #         scores = output_results[:, 4] * output_results[:, 5]
-        scores = output_results[:, 5]
+        scores = output_results[:, 4]
         bboxes = output_results[:, :4]  # x1y1x2y2
 #         img_h, img_w = img_info[0], img_info[1]
 #         scale = min(img_size[0] / float(img_h), img_size[1] / float(img_w))
