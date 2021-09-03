@@ -39,6 +39,7 @@ python3 -m torch.distributed.launch --nproc_per_node=8 \
     --data_txt_path_train ./datasets/data_path/mot17.half \
     --data_txt_path_val ./datasets/data_path/mot17.val \
 ```
+mot17.half and mot17.val are from https://github.com/ifzhang/FairMOT/tree/master/src/data
 
 
 Step2. 
