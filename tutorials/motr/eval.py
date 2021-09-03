@@ -379,7 +379,7 @@ class Detector(object):
 #             img_show = draw_bboxes(img_show, gt_boxes, identities=np.ones((len(gt_boxes), )) * -1)
         cv2.imwrite(img_path, img_show)
 
-    def detect(self, prob_threshold=0.8, area_threshold=100, vis=False):
+    def detect(self, prob_threshold=0.2, area_threshold=100, vis=False):
         total_dts = 0
         track_instances = None
         max_id = 0
@@ -402,7 +402,7 @@ class Detector(object):
             print("ref points.shape={}".format(res['ref_pts'].shape))
             all_ref_pts = tensor_to_numpy(res['ref_pts'][0, :, :2])
             dt_instances = track_instances.to(torch.device('cpu'))
-
+            
             # filter det instances by score.
             dt_instances = self.filter_dt_by_score(dt_instances, prob_threshold)
             dt_instances = self.filter_dt_by_area(dt_instances, area_threshold)
