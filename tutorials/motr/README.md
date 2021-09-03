@@ -20,7 +20,8 @@ add tracker.py to https://github.com/megvii-model/MOTR
 add mot_online to https://github.com/megvii-model/MOTR
 
 
-Step3. run motion tracker example:
+Step3. run
+
 
 train
 
@@ -86,5 +87,7 @@ python3 eval.py \
 
 
 
+# MOTR det
 
+replace https://github.com/megvii-model/MOTR/blob/main/models/motr.py by motr2.py 
 
