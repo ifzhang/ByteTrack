@@ -168,13 +168,9 @@ class DETTracker(object):
         lost_stracks = []
         removed_stracks = []
 
-#         output_results = output_results.cpu().numpy()
-#         scores = output_results[:, 4] * output_results[:, 5]
+        
         scores = output_results[:, 4]
         bboxes = output_results[:, :4]  # x1y1x2y2
-#         img_h, img_w = img_info[0], img_info[1]
-#         scale = min(img_size[0] / float(img_h), img_size[1] / float(img_w))
-#         bboxes /= scale
         
         remain_inds = scores > self.track_thresh
         dets = bboxes[remain_inds]
@@ -209,8 +205,6 @@ class DETTracker(object):
         # Predict the current location with KF
         STrack.multi_predict(strack_pool)
         dists = matching.iou_distance(strack_pool, detections)
-#         dists = matching.fuse_score(dists, detections)
-        #dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
         matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.8)
 
         for itracked, idet in matches:
@@ -254,7 +248,6 @@ class DETTracker(object):
         '''Deal with unconfirmed tracks, usually tracks with only one beginning frame'''
         detections = [detections[i] for i in u_detection]
         dists = matching.iou_distance(unconfirmed, detections)
-#         dists = matching.fuse_score(dists, detections)
         matches, u_unconfirmed, u_detection = matching.linear_assignment(dists, thresh=0.7)
         for itracked, idet in matches:
             unconfirmed[itracked].update(detections[idet], self.frame_id)
