@@ -1,26 +1,12 @@
 # MOTR
 
-Step1.  git clone https://github.com/megvii-model/MOTR.git
+Step1.  
 
-
-Step2. 
-   
-replace https://github.com/megvii-model/MOTR/blob/main/util/evaluation.py
-
-replace https://github.com/megvii-model/MOTR/blob/main/eval.py
+git clone https://github.com/megvii-model/MOTR.git and install
 
 replace https://github.com/megvii-model/MOTR/blob/main/datasets/joint.py
 
 replace https://github.com/megvii-model/MOTR/blob/main/datasets/transforms.py
-
-replace https://github.com/megvii-model/MOTR/blob/main/models/motr.py
-
-add tracker.py to https://github.com/megvii-model/MOTR
-
-add mot_online to https://github.com/megvii-model/MOTR
-
-
-Step3. run
 
 
 train
@@ -53,6 +39,23 @@ python3 -m torch.distributed.launch --nproc_per_node=8 \
     --data_txt_path_train ./datasets/data_path/mot17.half \
     --data_txt_path_val ./datasets/data_path/mot17.val \
 ```
+
+
+Step2. 
+   
+replace https://github.com/megvii-model/MOTR/blob/main/util/evaluation.py
+
+replace https://github.com/megvii-model/MOTR/blob/main/eval.py
+
+replace https://github.com/megvii-model/MOTR/blob/main/models/motr.py
+
+add tracker.py to https://github.com/megvii-model/MOTR
+
+add mot_online to https://github.com/megvii-model/MOTR
+
+
+Step3. 
+
 
 val
 
@@ -89,5 +92,6 @@ python3 eval.py \
 
 # MOTR det
 
-replace https://github.com/megvii-model/MOTR/blob/main/models/motr.py by motr2.py 
+in step2, replace https://github.com/megvii-model/MOTR/blob/main/models/motr.py by motr2.py 
 
+others are the same as MOTR
