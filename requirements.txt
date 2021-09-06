@@ -13,6 +13,7 @@ tabulate
 tensorboard
 lap
 motmetrics
+filterpy
 
 # verified versions
 onnx==1.8.1
