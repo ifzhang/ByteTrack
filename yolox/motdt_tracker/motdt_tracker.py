@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit
+#from numba import jit
 from collections import OrderedDict, deque
 import itertools
 import os
@@ -131,7 +131,7 @@ class STrack(BaseTrack):
                 self.tracker.update(image, self.tlwh)
 
     @property
-    @jit
+    #@jit
     def tlwh(self):
         """Get current position in bounding box format `(top left x, top left y,
                 width, height)`.
@@ -144,7 +144,7 @@ class STrack(BaseTrack):
         return ret
 
     @property
-    @jit
+    #@jit
     def tlbr(self):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
         `(top left, bottom right)`.
@@ -154,7 +154,7 @@ class STrack(BaseTrack):
         return ret
 
     @staticmethod
-    @jit
+    #@jit
     def tlwh_to_xyah(tlwh):
         """Convert bounding box to format `(center x, center y, aspect ratio,
         height)`, where the aspect ratio is `width / height`.
