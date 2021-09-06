@@ -1,4 +1,4 @@
-# BYTETrack
+# ByteTrack
 ByteTrack: Multi-Object Tracking BY Associating Every DeTEction Box
 
 <summary>Installation</summary>
