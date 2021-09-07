@@ -41,6 +41,8 @@ python3 -m torch.distributed.launch --nproc_per_node=8 \
 ```
 mot17.half and mot17.val are from https://github.com/ifzhang/FairMOT/tree/master/src/data
 
+You can also download the MOTR model trained by us: [google](https://drive.google.com/file/d/1pzGi53VooppQqhKf3TSxLK99LERsVyTw/view?usp=sharing), [baidu(code:t87h)](https://pan.baidu.com/s/1OrcR3L9Bf2xXIo8RQl3zyA)
+
 
 Step2. 
    
