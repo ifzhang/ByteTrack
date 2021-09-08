@@ -1,4 +1,4 @@
-# QDTrack_motion
+# QDTrack_reid_motion
 
 Step1.  git clone https://github.com/SysCV/qdtrack.git and train
 
@@ -9,7 +9,7 @@ replace https://github.com/SysCV/qdtrack/blob/master/qdtrack/models/mot/qdtrack.
 
 add mot_online to https://github.com/SysCV/qdtrack
 
-add traker_motion.py to https://github.com/SysCV/qdtrack and rename to tracker.py
+add traker_reid_motion.py to https://github.com/SysCV/qdtrack and rename to tracker.py
 
 Step3. run
 ```
