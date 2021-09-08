@@ -162,7 +162,7 @@ class DETTracker(object):
         self.kalman_filter = KalmanFilter()
 
 #     def update(self, output_results):
-    def update(self, det_bboxes, det_labels, frame_id):
+    def update(self, det_bboxes, det_labels, frame_id, track_feats=None):
 
 #         self.frame_id += 1
         self.frame_id = frame_id + 1
