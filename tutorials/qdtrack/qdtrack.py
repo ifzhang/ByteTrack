@@ -93,7 +93,7 @@ class QDTrack(TwoStageDetector):
         proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
         det_bboxes, det_labels, track_feats = self.roi_head.simple_test(x, img_metas, proposal_list, rescale)
 
-        bboxes, labels, ids = self.tracker.update(det_bboxes, det_labels, frame_id)
+        bboxes, labels, ids = self.tracker.update(det_bboxes, det_labels, frame_id, track_feats)
         
 #         if track_feats is not None:
 #             bboxes, labels, ids = self.tracker.match(
