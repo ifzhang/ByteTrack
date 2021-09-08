@@ -9,7 +9,7 @@ replace https://github.com/SysCV/qdtrack/blob/master/qdtrack/models/mot/qdtrack.
 
 add mot_online to https://github.com/SysCV/qdtrack
 
-add traker_reid_motion.py to https://github.com/SysCV/qdtrack and rename to tracker.py
+add tracker_reid_motion.py to https://github.com/SysCV/qdtrack and rename to tracker.py
 
 Step3. run
 ```
@@ -28,7 +28,7 @@ replace https://github.com/SysCV/qdtrack/blob/master/qdtrack/models/mot/qdtrack.
 
 add mot_online to https://github.com/SysCV/qdtrack
 
-add traker.py to https://github.com/SysCV/qdtrack
+add tracker.py to https://github.com/SysCV/qdtrack
 
 
 Step3. run
