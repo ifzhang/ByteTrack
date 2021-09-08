@@ -243,7 +243,7 @@ class DETTracker(object):
                 refind_stracks.append(track)
 
         for it in u_track:
-            #track = r_tracked_stracks[it]
+            #track = strack_pool[it]
             track = r_tracked_stracks[it]
             if not track.state == TrackState.Lost:
                 track.mark_lost()
