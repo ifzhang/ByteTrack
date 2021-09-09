@@ -232,6 +232,8 @@ def run_each_dataset(model_dir, retinanet, dataset_path, subset, cur_dataset):
 					track = tracklet(det_list_all[i][unmatched2[j]])
 					tracklet_all.append(track)
 
+                    
+
 	#**************visualize tracking result and save evaluate file****************
 
 	fout_tracking = open(os.path.join(model_dir, 'results', cur_dataset + '.txt'), 'w')
@@ -298,14 +300,15 @@ def main(args=None):
 	parser = argparse.ArgumentParser(description='Simple script for testing a CTracker network.')
 	parser.add_argument('--dataset_path', default='/dockerdata/home/jeromepeng/data/MOT/MOT17/', type=str, help='Dataset path, location of the images sequence.')
 	parser.add_argument('--model_dir', default='./trained_model/', help='Path to model (.pt) file.')
-
+	parser.add_argument('--model_path', default='./trained_model/model_final.pth', help='Path to model (.pt) file.')
 	parser = parser.parse_args(args)
 
 	if not os.path.exists(os.path.join(parser.model_dir, 'results')):
 		os.makedirs(os.path.join(parser.model_dir, 'results'))
     
 	retinanet = model.resnet50(num_classes=1, pretrained=True)
-	retinanet_save = torch.load(os.path.join(parser.model_dir, 'model_final.pth'))
+# 	retinanet_save = torch.load(os.path.join(parser.model_dir, 'model_final.pth'))
+	retinanet_save = torch.load(os.path.join(parser.model_path))
     
     # rename moco pre-trained keys
 	state_dict = retinanet_save.state_dict()
