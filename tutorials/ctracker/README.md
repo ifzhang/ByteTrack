@@ -15,7 +15,7 @@ python3 test.py tracking --exp_id mot17_half --dataset mot --dataset_version 17h
 
 Step4. 
 
-add mot_challenge.py to https://github.com/pjl1995/CTracker
+add eval_motchallenge.py to https://github.com/pjl1995/CTracker
 
 Step5. run
 ```
