@@ -7,11 +7,11 @@ Step2.
 
 add generate_half_csv.py to https://github.com/pjl1995/CTracker
 
-run generate_half_csv.py and train on MOT17 train_half
+run generate_half_csv.py
 
 run
 ```
-python3 train.py --root_path MOT17_ROOT --csv_train train_half_annots.csv --model_dir ./ctracker/ --depth 50
+python3 train.py --root_path MOT17 --csv_train train_half_annots.csv --model_dir ./ctracker/ --depth 50
 ```
 
 Step3. 
@@ -20,7 +20,7 @@ replace https://github.com/pjl1995/CTracker/blob/master/test.py
 
 run
 ```
-python3 test.py --dataset_path MOT17_ROOT --model_dir ./trained_model/
+python3 test.py --dataset_path MOT17 --model_dir ./trained_model/
 ```
 
 Step4. 
@@ -32,5 +32,5 @@ prepare gt_half_val.txt as CenterTrack [DATA.md](https://github.com/xingyizhou/C
 
 Step5. run
 ```
-python3 eval_motchallenge.py --groundtruths ../MOT17/train --tests results --gt_type half_val --eval_official  --score_threshold -1
+python3 eval_motchallenge.py --groundtruths MOT17/train --tests results --gt_type half_val --eval_official  --score_threshold -1
 ```
