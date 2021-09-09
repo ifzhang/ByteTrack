@@ -17,7 +17,7 @@ Step4.
 
 add eval_motchallenge.py to https://github.com/pjl1995/CTracker
 
-prepare gt_half_val.txt as [CenterTrack](https://github.com/xingyizhou/CenterTrack/blob/master/readme/DATA.md)
+prepare gt_half_val.txt as CenterTrack [DATA.md](https://github.com/xingyizhou/CenterTrack/blob/master/readme/DATA.md)
 
 
 Step5. run
