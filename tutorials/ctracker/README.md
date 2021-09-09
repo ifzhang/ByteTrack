@@ -11,7 +11,7 @@ run generate_half_csv.py and put train_half_annots.csv in MOT17
 
 run
 ```
-python3 train.py --root_path MOT17 --csv_train train_half_annots.csv --model_dir ctracker/ --depth 50
+python3 train.py --root_path MOT17 --csv_train train_half_annots.csv --model_dir ctracker/ --depth 50 --epochs 50
 ```
 
 Step3. 
