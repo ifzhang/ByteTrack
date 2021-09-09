@@ -16,8 +16,9 @@ python3 test.py tracking --exp_id mot17_half --dataset mot --dataset_version 17h
 Step4. 
 
 add eval_motchallenge.py to https://github.com/pjl1995/CTracker
+prepare gt_half_val.txt as [CenterTrack](https://github.com/xingyizhou/CenterTrack/blob/master/readme/DATA.md)
 
 Step5. run
 ```
-python3 eval_motchallenge.py --groundtruths ../MOT17/train --tests results --gt_type half-val --eval_official  --score_threshold -1
+python3 eval_motchallenge.py --groundtruths ../MOT17/train --tests results --gt_type half_val --eval_official  --score_threshold -1
 ```
