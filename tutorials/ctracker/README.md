@@ -9,6 +9,10 @@ add generate_half_csv.py to https://github.com/pjl1995/CTracker
 
 run generate_half_csv.py and train on MOT17 train_half
 
+run
+```
+python3 train.py --root_path MOT17_ROOT --csv_train train_half_annots.csv --model_dir ./ctracker/ --depth 50
+```
 
 Step3. 
 
