@@ -1,14 +1,20 @@
 # CTracker
 
-Step1.  git clone https://github.com/pjl1995/CTracker.git and train on MOT17 train_half
+Step1.  git clone https://github.com/pjl1995/CTracker.git
 
 
 Step2. 
 
+add generate_half_csv.py to https://github.com/pjl1995/CTracker
+
+run generate_half_csv.py and train on MOT17 train_half
+
+
+Step3. 
+
 replace https://github.com/pjl1995/CTracker/blob/master/test.py
 
-
-Step3. run
+run
 ```
 python3 test.py --dataset_path MOT17_ROOT --model_dir ./trained_model/
 ```
