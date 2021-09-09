@@ -1,13 +1,14 @@
 import os
 import numpy as np
+prefix_dir = 'MOT17/'
 root_dir = 'train/'
 result_csv = 'train_half_annots.csv'
 train_half_set = {2: 301, 4: 526, 5:419, 9:263, 10:328, 11:451, 13:376}
 fout = open(result_csv, 'w')
 
-for data_name in sorted(os.listdir(root_dir)):
+for data_name in sorted(os.listdir(prefix_dir + root_dir)):
 	print(data_name)
-	gt_path = os.path.join(root_dir, data_name, 'gt', 'gt.txt')
+	gt_path = os.path.join(prefix_dir, root_dir, data_name, 'gt', 'gt.txt')
 	# print(gt_path)
 	data_raw = np.loadtxt(gt_path, delimiter=',', dtype='float', usecols=(0,1,2,3,4,5,6,7,8))
 
