@@ -7,7 +7,7 @@ Step2.
 
 add generate_half_csv.py to https://github.com/pjl1995/CTracker
 
-run generate_half_csv.py
+run generate_half_csv.py and put train_half_annots.csv in MOT17
 
 run
 ```
