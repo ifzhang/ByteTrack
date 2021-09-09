@@ -13,6 +13,7 @@ run
 ```
 python3 train.py --root_path MOT17 --csv_train train_half_annots.csv --model_dir ctracker/ --depth 50 --epochs 50
 ```
+You can also download the CTracker model trained by us: [google](https://drive.google.com/file/d/1TwBDomJx8pxD-e96mGIiTduLenUvmf1t/view?usp=sharing), [baidu(code:6p3w)](https://pan.baidu.com/s/1MaCvnHynX2Wzg81hWkqzeg)
 
 Step3. 
 
@@ -20,7 +21,7 @@ replace https://github.com/pjl1995/CTracker/blob/master/test.py
 
 run
 ```
-python3 test.py --dataset_path MOT17 --model_dir ./ctracker --model_path ctracker/model_final.pt
+python3 test.py --dataset_path MOT17 --model_dir ./ctracker --model_path ctracker/mot17_half_ctracker.pt
 ```
 
 Step4. 
