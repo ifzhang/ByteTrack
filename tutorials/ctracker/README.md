@@ -1,7 +1,7 @@
 # CTracker
 
 #### Step1  
-git clone https://github.com/pjl1995/CTracker.git
+git clone https://github.com/pjl1995/CTracker.git and preapare dataset
 
 
 #### Step2
