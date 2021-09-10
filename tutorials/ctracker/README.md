@@ -21,7 +21,7 @@ replace https://github.com/pjl1995/CTracker/blob/master/test.py
 
 run
 ```
-python3 test.py --dataset_path MOT17 --model_dir ./ctracker --model_path ctracker/mot17_half_ctracker.pt
+python3 test.py --dataset_path MOT17 --model_dir ctracker --model_path ctracker/mot17_half_ctracker.pt
 ```
 
 Step4. 
@@ -29,6 +29,27 @@ Step4.
 add eval_motchallenge.py to https://github.com/pjl1995/CTracker
 
 prepare gt_half_val.txt as CenterTrack [DATA.md](https://github.com/xingyizhou/CenterTrack/blob/master/readme/DATA.md)
+
+
+Step5. run
+```
+python3 eval_motchallenge.py --groundtruths MOT17/train --tests ctracker/results --gt_type half_val --eval_official  --score_threshold -1
+```
+
+
+
+# CTracker_byte
+
+Step3. 
+
+add mot_online to https://github.com/pjl1995/CTracker
+add tracker.py to https://github.com/pjl1995/CTracker
+add test_byte.py to https://github.com/pjl1995/CTracker
+
+run
+```
+python3 test_byte.py --dataset_path MOT17 --model_dir ctracker --model_path ctracker/mot17_half_ctracker.pt
+```
 
 
 Step5. run
