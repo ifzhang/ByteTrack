@@ -14,6 +14,7 @@ tensorboard
 lap
 motmetrics
 filterpy
+h5py
 
 # verified versions
 onnx==1.8.1
