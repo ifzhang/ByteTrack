@@ -5,6 +5,8 @@ import itertools
 import os
 import cv2
 import torch
+from torch._C import dtype
+import torchvision
 
 from yolox.motdt_tracker import matching
 from .kalman_filter import KalmanFilter
@@ -231,6 +233,30 @@ class OnlineTracker(object):
         if det_scores is None:
             det_scores = np.ones(len(tlwhs), dtype=float)
         detections = [STrack(tlwh, score, from_det=True) for tlwh, score in zip(tlwhs, det_scores)]
+        if self.use_tracking:
+            tracks = [STrack(t.self_tracking(image), t.score * t.tracklet_score(), from_det=False)
+                        for t in itertools.chain(self.tracked_stracks, self.lost_stracks) if t.is_activated]
+            detections.extend(tracks)
+        rois = np.asarray([d.tlbr for d in detections], dtype=np.float32)
+        scores = np.asarray([d.score for d in detections], dtype=np.float32)
+        # nms
+        if len(detections) > 0:
+            nms_out_index = torchvision.ops.batched_nms(
+            torch.from_numpy(rois),
+            torch.from_numpy(scores.reshape(-1)).to(torch.from_numpy(rois).dtype),
+            torch.zeros_like(torch.from_numpy(scores.reshape(-1))),
+            0.7,
+            )
+            keep = nms_out_index.numpy()
+            mask = np.zeros(len(rois), dtype=np.bool)
+            mask[keep] = True
+            keep = np.where(mask & (scores >= self.min_cls_score))[0]
+            detections = [detections[i] for i in keep]
+            scores = scores[keep]
+            for d, score in zip(detections, scores):
+                d.score = score
+        pred_dets = [d for d in detections if not d.from_det]
+        detections = [d for d in detections if d.from_det]
 
         # set features
         tlbrs = [det.tlbr for det in detections]
@@ -269,7 +295,7 @@ class OnlineTracker(object):
         # remaining tracked
         # tracked
         len_det = len(u_detection)
-        detections = [detections[i] for i in u_detection]
+        detections = [detections[i] for i in u_detection] + pred_dets
         r_tracked_stracks = [tracked_stracks[i] for i in u_track]
         dists = matching.iou_distance(r_tracked_stracks, detections)
         matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.5)
