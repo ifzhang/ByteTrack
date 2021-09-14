@@ -4,9 +4,9 @@
 
 from loguru import logger
 
-import apex
 import torch
-from apex import amp
+
+from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 
 from yolox.data import DataPrefetcher
@@ -40,6 +40,7 @@ class Trainer:
         # training related attr
         self.max_epoch = exp.max_epoch
         self.amp_training = args.fp16
+        self.scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
         self.is_distributed = get_world_size() > 1
         self.rank = get_rank()
         self.local_rank = args.local_rank
@@ -95,16 +96,14 @@ class Trainer:
         targets.requires_grad = False
         data_end_time = time.time()
 
-        outputs = self.model(inps, targets)
+        with torch.cuda.amp.autocast(enabled=self.amp_training):
+            outputs = self.model(inps, targets)
         loss = outputs["total_loss"]
 
         self.optimizer.zero_grad()
-        if self.amp_training:
-            with amp.scale_loss(loss, self.optimizer) as scaled_loss:
-                scaled_loss.backward()
-        else:
-            loss.backward()
-        self.optimizer.step()
+        self.scaler.scale(loss).backward()
+        self.scaler.step(self.optimizer)
+        self.scaler.update()
 
         if self.use_model_ema:
             self.ema_model.update(self.model)
@@ -136,9 +135,6 @@ class Trainer:
         # solver related init
         self.optimizer = self.exp.get_optimizer(self.args.batch_size)
 
-        if self.amp_training:
-            model, optimizer = amp.initialize(model, self.optimizer, opt_level="O1")
-
         # value of epoch will be set in `resume_train`
         model = self.resume_train(model)
 
@@ -161,9 +157,7 @@ class Trainer:
             occupy_mem(self.local_rank)
 
         if self.is_distributed:
-            model = apex.parallel.DistributedDataParallel(model)
-            # from torch.nn.parallel import DistributedDataParallel as DDP
-            # model = DDP(model, device_ids=[self.local_rank], broadcast_buffers=False)
+            model = DDP(model, device_ids=[self.local_rank], broadcast_buffers=False)
 
         if self.use_model_ema:
             self.ema_model = ModelEMA(model, 0.9998)
@@ -279,9 +273,6 @@ class Trainer:
             # resume the model/optimizer state dict
             model.load_state_dict(ckpt["model"])
             self.optimizer.load_state_dict(ckpt["optimizer"])
-            # resume the training states variables
-            if self.amp_training and "amp" in ckpt:
-                amp.load_state_dict(ckpt["amp"])
             start_epoch = (
                 self.args.start_epoch - 1
                 if self.args.start_epoch is not None
@@ -315,7 +306,6 @@ class Trainer:
             logger.info("\n" + summary)
         synchronize()
 
-        #self.save_ckpt("last_epoch", ap50_95 > self.best_ap)
         #self.best_ap = max(self.best_ap, ap50_95)
         self.save_ckpt("last_epoch", ap50 > self.best_ap)
         self.best_ap = max(self.best_ap, ap50)
@@ -329,10 +319,6 @@ class Trainer:
                 "model": save_model.state_dict(),
                 "optimizer": self.optimizer.state_dict(),
             }
-            if self.amp_training:
-                # save amp state according to
-                # https://nvidia.github.io/apex/amp.html#checkpointing
-                ckpt_state["amp"] = amp.state_dict()
             save_checkpoint(
                 ckpt_state,
                 update_best_ckpt,
