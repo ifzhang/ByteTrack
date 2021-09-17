@@ -9,7 +9,6 @@ import cv2
 import torch
 
 from yolox.data.data_augment import preproc
-from yolox.data.datasets import COCO_CLASSES
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess, vis
 from yolox.utils.visualize import plot_tracking
@@ -118,14 +117,12 @@ class Predictor(object):
         self,
         model,
         exp,
-        cls_names=COCO_CLASSES,
         trt_file=None,
         decoder=None,
         device="cpu",
         fp16=False
     ):
         self.model = model
-        self.cls_names = cls_names
         self.decoder = decoder
         self.num_classes = exp.num_classes
         self.confthre = exp.test_conf
@@ -177,24 +174,6 @@ class Predictor(object):
             )
             #logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info
-
-    def visual(self, output, img_info, cls_conf=0.35):
-        ratio = img_info["ratio"]
-        img = img_info["raw_img"]
-        if output is None:
-            return img
-        output = output.cpu()
-
-        bboxes = output[:, 0:4]
-
-        # preprocessing: resize
-        bboxes /= ratio
-
-        cls = output[:, 6]
-        scores = output[:, 4] * output[:, 5]
-
-        vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
-        return vis_res
 
 
 def image_demo(predictor, vis_folder, path, current_time, save_result):
@@ -359,7 +338,7 @@ def main(exp, args):
         trt_file = None
         decoder = None
 
-    predictor = Predictor(model, exp, COCO_CLASSES, trt_file, decoder, args.device, args.fp16)
+    predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16)
     current_time = time.localtime()
     if args.demo == "image":
         image_demo(predictor, vis_folder, args.path, current_time, args.save_result)
