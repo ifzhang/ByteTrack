@@ -46,6 +46,11 @@ data_dir=os.path.join(get_yolox_datadir(), "mot"),
 
 
 <summary>Prepare pretrained models</summary>
+ablation model
+mot17 test model
+mot20 test model
+yolox_s demo model
+yolox_s tensorrt model
 
 ```shell
 cd <ByteTrack_HOME>
