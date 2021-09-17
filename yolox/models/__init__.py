@@ -8,5 +8,3 @@ from .yolo_fpn import YOLOFPN
 from .yolo_head import YOLOXHead
 from .yolo_pafpn import YOLOPAFPN
 from .yolox import YOLOX
-from .yolox_reid import YOLOXReID
-from .yolo_head_reid import YOLOXHeadReID
