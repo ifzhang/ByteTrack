@@ -84,3 +84,13 @@ cd <ByteTrack_HOME>
 python3 tools/train.py -f exps/example/mot/yolox_x_ch_150.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
 ```
 
+<summary>Demo</summary>
+```shell
+cd <ByteTrack_HOME>
+python3 tools/demo_track.py video -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar --fp16 --fuse --save_result
+```
+
+<summary>Ablation</summary>
+cd <ByteTrack_HOME>
+python3 tools/track.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
+```
