@@ -11,22 +11,13 @@ pip3 install -r requirements.txt
 python3 setup.py develop
 ```
 
-Step2. Install [apex](https://github.com/NVIDIA/apex).
-
-```shell
-# skip this step if you don't want to train model.
-git clone https://github.com/NVIDIA/apex
-cd apex
-pip3 install -v --disable-pip-version-check --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
-```
-
-Step3. Install [pycocotools](https://github.com/cocodataset/cocoapi).
+Step2. Install [pycocotools](https://github.com/cocodataset/cocoapi).
 
 ```shell
 pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
 ```
 
-Step4. Others
+Step3. Others
 ```shell
 pip3 install cython_bbox
 ```
