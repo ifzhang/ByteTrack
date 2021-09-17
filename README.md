@@ -11,22 +11,13 @@ pip3 install -r requirements.txt
 python3 setup.py develop
 ```
 
-Step2. Install [apex](https://github.com/NVIDIA/apex).
-
-```shell
-# skip this step if you don't want to train model.
-git clone https://github.com/NVIDIA/apex
-cd apex
-pip3 install -v --disable-pip-version-check --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
-```
-
-Step3. Install [pycocotools](https://github.com/cocodataset/cocoapi).
+Step2. Install [pycocotools](https://github.com/cocodataset/cocoapi).
 
 ```shell
 pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
 ```
 
-Step4. Others
+Step3. Others
 ```shell
 pip3 install cython_bbox
 ```
@@ -84,3 +75,13 @@ cd <ByteTrack_HOME>
 python3 tools/train.py -f exps/example/mot/yolox_x_ch_150.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
 ```
 
+<summary>Demo</summary>
+```shell
+cd <ByteTrack_HOME>
+python3 tools/demo_track.py video -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar --fp16 --fuse --save_result
+```
+
+<summary>Ablation</summary>
+cd <ByteTrack_HOME>
+python3 tools/track.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
+```
