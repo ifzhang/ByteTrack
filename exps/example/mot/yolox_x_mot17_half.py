@@ -20,13 +20,13 @@ class Exp(MyExp):
         self.input_size = (800, 1440)
         self.test_size = (800, 1440)
         self.random_size = (18, 32)
-        self.max_epoch = 150
+        self.max_epoch = 80
         self.print_interval = 20
         self.eval_interval = 5
         self.test_conf = 0.1
         self.nmsthre = 0.7
         self.no_aug_epochs = 10
-        self.basic_lr_per_img = 0.002 / 64.0
+        self.basic_lr_per_img = 0.001 / 64.0
         self.warmup_epochs = 1
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False):
@@ -40,9 +40,9 @@ class Exp(MyExp):
         )
 
         dataset = MOTDataset(
-            data_dir=os.path.join(get_yolox_datadir(), "ch_all"),
+            data_dir=os.path.join(get_yolox_datadir(), "mot"),
             json_file=self.train_ann,
-            name='',
+            name='train',
             img_size=self.input_size,
             preproc=TrainTransform(
                 rgb_means=(0.485, 0.456, 0.406),

@@ -12,20 +12,22 @@ class Exp(MyExp):
     def __init__(self):
         super(Exp, self).__init__()
         self.num_classes = 1
-        self.depth = 1.33
-        self.width = 1.25
+        self.depth = 0.67
+        self.width = 0.75
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         self.train_ann = "train.json"
-        self.val_ann = "test.json"
-        self.input_size = (736, 1280)
-        self.test_size = (736, 1280)
-        self.max_epoch = 100
+        self.val_ann = "train.json"
+        self.input_size = (800, 1440)
+        self.test_size = (800, 1440)
+        self.random_size = (18, 32)
+        self.max_epoch = 80
         self.print_interval = 20
         self.eval_interval = 5
         self.test_conf = 0.001
         self.nmsthre = 0.7
         self.no_aug_epochs = 10
-        self.basic_lr_per_img = 0.002 / 64.0
+        self.basic_lr_per_img = 0.001 / 64.0
+        self.warmup_epochs = 1
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False):
         from yolox.data import (
@@ -38,7 +40,7 @@ class Exp(MyExp):
         )
 
         dataset = MOTDataset(
-            data_dir=os.path.join(get_yolox_datadir(), "mix_mot_ch_all"),
+            data_dir=os.path.join(get_yolox_datadir(), "mix_det"),
             json_file=self.train_ann,
             name='',
             img_size=self.input_size,
@@ -95,8 +97,8 @@ class Exp(MyExp):
         valdataset = MOTDataset(
             data_dir=os.path.join(get_yolox_datadir(), "mot"),
             json_file=self.val_ann,
-            name='test',
             img_size=self.test_size,
+            name='train',
             preproc=ValTransform(
                 rgb_means=(0.485, 0.456, 0.406),
                 std=(0.229, 0.224, 0.225),
