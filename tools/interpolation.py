@@ -116,8 +116,8 @@ def dti(txt_path, save_path, n_min=25, n_dti=20):
 
 if __name__ == '__main__':
     data_root = '/opt/tiger/demo/YOLOX/datasets/mot/test'
-    txt_path = '/opt/tiger/demo/YOLOX/YOLOX_outputs/yolox_mix_det_800/track_results'
-    save_path = '/opt/tiger/demo/YOLOX/YOLOX_outputs/yolox_mix_det_800/track_results_dti'
+    txt_path = '/opt/tiger/demo/YOLOX/YOLOX_outputs/yolox_x_mix_det/track_results'
+    save_path = '/opt/tiger/demo/YOLOX/YOLOX_outputs/yolox_x_mix_det/track_results_dti'
     
     mkdir_if_missing(save_path)
     dti(txt_path, save_path, n_min=5, n_dti=20)
