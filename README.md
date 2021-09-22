@@ -1,7 +1,7 @@
 # ByteTrack
 ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box
 
-<summary>Installation</summary>
+## Installation
 
 Step1. Install ByteTrack.
 ```shell
@@ -22,7 +22,7 @@ Step3. Others
 pip3 install cython_bbox
 ```
 
-<summary>Download and prepare datasets</summary>
+## Data preparation
 
 Download [MOT17](https://motchallenge.net/), [MOT20](https://motchallenge.net/), [CrowdHuman](https://www.crowdhuman.org/), [Cityperson](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md), [ETHZ](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) and put them under <ByteTrack_HOME>/datasets in the following structure:
 ```
@@ -58,7 +58,7 @@ data_dir=os.path.join(get_yolox_datadir(), "mot"),
 ```
 
 
-<summary>Prepare pretrained models</summary>
+## Pretrained models
 
 ablation model
 
@@ -78,46 +78,74 @@ hdfs dfs -get hdfs://haruna/home/byte_arnold_hl_vc/zhangyifu/debug1/models/bytet
 tar -zxvf bytetrack_models.tar.gz
 ```
 
-<summary>Run tracking</summary>
+## Training
+
+* **Train ablation model (MOT17 half train and CrowdHuman)**
+
+```shell
+cd <ByteTrack_HOME>
+python3 tools/train.py -f exps/example/mot/yolox_x_ablation.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
+```
+
+* **Train MOT17 test model (MOT17 train, CrowdHuman, Cityperson and ETHZ)**
+
+```shell
+cd <ByteTrack_HOME>
+python3 tools/train.py -f exps/example/mot/yolox_x_mix_det.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
+```
+
+* **Train MOT20 test model (MOT20 train, CrowdHuman)**
+
+```shell
+cd <ByteTrack_HOME>
+python3 tools/train.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
+```
+
+## Tracking
+
+* **Evaluation on MOT17 half val**
 
 Run ByteTrack:
 
 ```shell
 cd <ByteTrack_HOME>
-python3 tools/track.py -f exps/example/mot/yolox_x_ch_150.py -c pretrained/yolox_x_ch_150.pth.tar -b 1 -d 1 --fp16 --fuse
+python3 tools/track.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
 ```
+You can get 76.6 MOTA using our pretrained model. 
 
 Run other trackers:
 ```shell
-python3 tools/track_sort.py -f exps/example/mot/yolox_x_ch_150.py -c pretrained/yolox_x_ch_150.pth.tar -b 1 -d 1 --fp16 --fuse
-python3 tools/track_deepsort.py -f exps/example/mot/yolox_x_ch_150.py -c pretrained/yolox_x_ch_150.pth.tar -b 1 -d 1 --fp16 --fuse
-python3 tools/track_motdt.py -f exps/example/mot/yolox_x_ch_150.py -c pretrained/yolox_x_ch_150.pth.tar -b 1 -d 1 --fp16 --fuse
+python3 tools/track_sort.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
+python3 tools/track_deepsort.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
+python3 tools/track_motdt.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
 ```
 
-<summary>Train on CrowdHuman</summary>
-Mix crowdhuman_train and crowdhuman_val and put the crowdhuman folder under datasets.
+* **Test on MOT17**
+
+Run ByteTrack:
 
 ```shell
 cd <ByteTrack_HOME>
-python3 tools/train.py -f exps/example/mot/yolox_x_ch_150.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
+python3 tools/track.py -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_mot17_test.pth.tar -b 1 -d 1 --fp16 --fuse
+python3 tools/interpolation.py
 ```
+Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and you can get 79+ MOTA (For 80+ MOTA, you need to carefully tune the test image size and high score detection threshold of each sequence). 
 
-<summary>Demo</summary>
+* **Test on MOT20**
+
+Run ByteTrack:
 
 ```shell
 cd <ByteTrack_HOME>
-python3 tools/demo_track.py video -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar --fp16 --fuse --save_result
+python3 tools/track.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -c pretrained/bytetrack_mot20_test.pth.tar -b 1 -d 1 --fp16 --fuse
+python3 tools/interpolation.py
 ```
+Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and you can get 77+ MOTA (For higher MOTA, you need to carefully tune the test image size and high score detection threshold of each sequence). 
 
-<summary>Evaluate ablation model</summary>
+
+## Demo
 
 ```shell
 cd <ByteTrack_HOME>
-python3 tools/track.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
-```
-<summary>Train ablation model</summary>
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/train.py -f exps/example/mot/yolox_x_ablation.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
+python3 tools/demo_track.py video -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_mot17_test.pth.tar --fp16 --fuse --save_result
 ```
