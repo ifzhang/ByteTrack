@@ -37,10 +37,15 @@ data_dir=os.path.join(get_yolox_datadir(), "mot"),
 
 
 <summary>Prepare pretrained models</summary>
+
 ablation model
+
 mot17 test model
+
 mot20 test model
+
 yolox_s demo model
+
 yolox_s tensorrt model
 
 ```shell
@@ -82,11 +87,13 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_x_ablation.py -c pre
 ```
 
 <summary>Ablation</summary>
+
 ```shell
 cd <ByteTrack_HOME>
 python3 tools/track.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
 ```
 <summary>Ablation</summary>
+
 ```shell
 cd <ByteTrack_HOME>
 python3 tools/train.py -f exps/example/mot/yolox_x_mix_det.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
