@@ -22,9 +22,31 @@ Step3. Others
 pip3 install cython_bbox
 ```
 
-<summary>Prepare datasets</summary>
+<summary>Download and prepare datasets</summary>
 
-Prepare coco format mot dataset.
+Download [MOT17](https://motchallenge.net/), [MOT20](https://motchallenge.net/), [CrowdHuman](https://www.crowdhuman.org/), [Cityperson](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md), [ETHZ](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) and put them under <ByteTrack_HOME>/datasets in the following structure:
+```
+datasets
+   |——————mot
+   |        └——————train
+   |        └——————test
+   └——————crowdhuman
+   |         └——————Crowdhuman_train
+   |         └——————Crowdhuman_val
+   |         └——————annotation_train.odgt
+   |         └——————annotation_val.odgt
+   └——————MOT20
+   |        └——————train
+   |        └——————test
+   └——————Cityscapes
+   |        └——————images
+   |        └——————labels_with_ids
+   └——————ETHZ
+            └——————eth01
+            └——————...
+            └——————eth07
+```
+
 ```shell
 cd <ByteTrack_HOME>
 mkdir datasets
