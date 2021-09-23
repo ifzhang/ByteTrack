@@ -14,4 +14,3 @@ from .metric import *
 from .model_utils import *
 from .setup_env import *
 from .visualize import *
-from .boxes import postprocess_reid
