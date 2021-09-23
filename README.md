@@ -47,16 +47,6 @@ datasets
             └——————eth07
 ```
 
-```shell
-cd <ByteTrack_HOME>
-mkdir datasets
-ln -s /path/to/your/mot ./datasets/mot
-```
-Change 'data_dir' in get_eval_loader() in exps/example/mot/yolox_x_ch.py ("mot" to "dancetrack")
-```
-data_dir=os.path.join(get_yolox_datadir(), "mot"),
-```
-
 
 ## Pretrained models
 
