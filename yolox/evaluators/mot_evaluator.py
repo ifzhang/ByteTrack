@@ -149,23 +149,6 @@ class MOTEvaluator:
                     self.args.track_buffer = 25
                 else:
                     self.args.track_buffer = 30
-                
-                # if video_name == 'MOT17-02-FRCNN':
-                #     self.args.match_thresh = 0.8
-                # elif video_name == 'MOT17-04-FRCNN':
-                #     self.args.match_thresh = 0.8
-                # elif video_name == 'MOT17-05-FRCNN' or video_name == 'MOT17-06-FRCNN':
-                #     self.args.match_thresh = 0.9
-                # elif video_name == 'MOT17-09-FRCNN':
-                #     self.args.match_thresh = 0.8
-                # elif video_name == 'MOT17-10-FRCNN':
-                #     self.args.match_thresh = 0.9
-                # elif video_name == 'MOT17-11-FRCNN':
-                #     self.args.match_thresh = 0.8
-                # elif video_name == 'MOT17-13-FRCNN' or video_name == 'MOT17-14-FRCNN':
-                #     self.args.match_thresh = 0.9
-                # else:
-                #     self.args.match_thresh = 0.8
 
                 if video_name == 'MOT17-06-FRCNN':
                     self.args.track_thresh = 0.75
@@ -173,8 +156,8 @@ class MOTEvaluator:
                 #     self.args.track_thresh = 0.7
                 # elif video_name == 'MOT17-12-FRCNN':
                 #     self.args.track_thresh = 0.7
-                # elif video_name == 'MOT17-14-FRCNN':
-                #     self.args.track_thresh = 0.65
+                elif video_name == 'MOT17-14-FRCNN':
+                    self.args.track_thresh = 0.65
                 else:
                     self.args.track_thresh = ori_thresh
 
