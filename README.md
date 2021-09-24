@@ -90,7 +90,7 @@ Train on CrowdHuman and MOT17 half train, evaluate on MOT17 half val
 |------------|-------|------|------|------|
 |ByteTrack_ablation [[google]](https://drive.google.com/file/d/1iqhM-6V_r1FpOlOzrdP_Ejshgk0DxOob/view?usp=sharing), [[baidu(code:eeo8)]](https://pan.baidu.com/s/1W5eRBnxc4x9V8gm7dgdEYg) | 76.6 | 79.3 | 159 | 29.6 |
 
-### MOT17 Test model
+### MOT17 test model
 
 Train on CrowdHuman, MOT17, Cityperson and ETHZ, evaluate on MOT17 train
 
