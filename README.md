@@ -60,17 +60,35 @@ datasets
 ```
 
 
-## Pretrained models
+## Model zoo
 
-ablation model
+### Ablatioin model
 
-mot17 test model
+Train on CrowdHuman and MOT17 half train, evaluate on MOT17 half val
 
-mot20 test model
+| Model    |  MOTA | IDF1 | IDs | FPS |
+|------------|-------|------|------|------|
+|ByteTrack_ablation | 76.6 | 79.3 | 159 | 29.6 |
 
-yolox_s demo model
+### MOT17 Test model
 
-yolox_s tensorrt model
+Train on CrowdHuman, MOT17, Cityperson and ETHZ, evaluate on MOT17 train
+
+| Model    |  MOTA | IDF1 | IDs | FPS |
+|------------|-------|------|------|------|
+|ByteTrack_x | 90.0 | 83.3 | 422 | 29.6 |
+|ByteTrack_l | 88.7 | 80.7 | 460 | 43.7 |
+|ByteTrack_m | 87.0 | 80.1 | 477 | 54.1 |
+|ByteTrack_s | 79.2 | 74.3 | 533 | 64.5 |
+
+
+### MOT20 test model
+
+Train on CrowdHuman and MOT20, evaluate on MOT20 train
+
+| Model    |  MOTA | IDF1 | IDs | FPS |
+|------------|-------|------|------|------|
+|ByteTrack_x | 90.0 | 83.3 | 422 | 29.6 |
 
 ```shell
 cd <ByteTrack_HOME>
