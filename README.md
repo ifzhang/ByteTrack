@@ -7,12 +7,10 @@ Multi-object tracking (MOT) aims at estimating bounding boxes and identities of 
 
 ## Tracking performance
 ### Results on MOT challenge test set
-| Dataset    |  MOTA | IDF1 | HOTA | IDS | MT | ML | FP | FN | FPS |
+| Dataset    |  MOTA | IDF1 | HOTA | MT | ML | FP | FN | IDs | FPS |
 |------------|-------|------|------|-------|-------|------|------|------|------|
-|MOT17       | 80.3 | 77.3 | 63.1 | 53.2% | 14.5% | 25491 | 83721 | 29.6 |
-|MOT20       | 77.8 | 75.2 | 61.3 | 69.2% | 9.5% | 26249 | 87594 | 13.7 |
-
- All of the results are obtained on the [MOT challenge](https://motchallenge.net) evaluation server under the “private detector” protocol. We rank first among all the trackers on 2DMOT15, MOT16, MOT17 and  MOT20. The tracking speed of the entire system can reach up to **30 FPS**.
+|MOT17       | 80.3 | 77.3 | 63.1 | 53.2% | 14.5% | 25491 | 83721 | 2196 | 29.6 |
+|MOT20       | 77.8 | 75.2 | 61.3 | 69.2% | 9.5%  | 26249 | 87594 | 1223 | 13.7 |
 
 ## Installation
 
