@@ -123,6 +123,8 @@ Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and yo
 
 * **Test on MOT20**
 
+For MOT20, you need to clip the bounding boxes inside the image. 
+
 Run ByteTrack:
 
 ```shell
