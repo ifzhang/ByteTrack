@@ -1,5 +1,6 @@
 # ByteTrack
 ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box
+
 <img src="assets/teasing.png" width="400"/>
 
 ## Abstract
