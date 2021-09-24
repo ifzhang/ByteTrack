@@ -1,6 +1,6 @@
 # ByteTrack
 ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box
-![](assets/teasing.png)
+<img src="assets/teasing.png" width="600"/>
 
 ## Installation
 
