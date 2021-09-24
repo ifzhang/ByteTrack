@@ -193,3 +193,7 @@ See [tutorials](https://github.com/ifzhang/ByteTrack/tree/main/tutorials).
 cd <ByteTrack_HOME>
 python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --fp16 --fuse --save_result
 ```
+
+## Acknowledgement
+
+A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT), [TransTrack](https://github.com/PeizeSun/TransTrack). Many thanks for their wonderful works.
