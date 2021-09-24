@@ -1,5 +1,6 @@
 # ByteTrack
 ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box
+![](assets/teasing.pdf)
 
 ## Installation
 
