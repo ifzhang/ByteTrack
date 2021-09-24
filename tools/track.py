@@ -225,8 +225,10 @@ def main(exp, args, num_gpu):
     # evaluate MOTA
     mm.lap.default_solver = 'lap'
 
-    gt_type = '_val_half'
-    #gt_type = ''
+    if exp.val_ann == 'val_half.json':
+        gt_type = '_val_half'
+    else:
+        gt_type = ''
     print('gt_type', gt_type)
     gtfiles = glob.glob(
       os.path.join('datasets/mot/train', '*/gt/gt{}.txt'.format(gt_type)))
