@@ -1,6 +1,6 @@
 # ByteTrack
 ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box
-![](assets/teasing.pdf)
+![](assets/teasing.png)
 
 ## Installation
 
@@ -138,7 +138,9 @@ Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and yo
 
 ## Demo
 
+<img src="assets/palace_demo.gif" width="600"/>
+
 ```shell
 cd <ByteTrack_HOME>
-python3 tools/demo_track.py video -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_mot17_test.pth.tar --fp16 --fuse --save_result
+python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_mot17_test.pth.tar --fp16 --fuse --save_result
 ```
