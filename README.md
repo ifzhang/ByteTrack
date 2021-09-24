@@ -68,7 +68,7 @@ Train on CrowdHuman and MOT17 half train, evaluate on MOT17 half val
 
 | Model    |  MOTA | IDF1 | IDs | FPS |
 |------------|-------|------|------|------|
-|ByteTrack_ablation | 76.6 | 79.3 | 159 | 29.6 |
+|ByteTrack_ablation [[google]](https://drive.google.com/file/d/1iqhM-6V_r1FpOlOzrdP_Ejshgk0DxOob/view?usp=sharing), [[baidu(code:eeo8)]](https://pan.baidu.com/s/1W5eRBnxc4x9V8gm7dgdEYg) | 76.6 | 79.3 | 159 | 29.6 |
 
 ### MOT17 Test model
 
@@ -76,10 +76,10 @@ Train on CrowdHuman, MOT17, Cityperson and ETHZ, evaluate on MOT17 train
 
 | Model    |  MOTA | IDF1 | IDs | FPS |
 |------------|-------|------|------|------|
-|ByteTrack_x_mot17 | 90.0 | 83.3 | 422 | 29.6 |
-|ByteTrack_l_mot17 | 88.7 | 80.7 | 460 | 43.7 |
-|ByteTrack_m_mot17 | 87.0 | 80.1 | 477 | 54.1 |
-|ByteTrack_s_mot17 | 79.2 | 74.3 | 533 | 64.5 |
+|ByteTrack_x_mot17 [[google]](https://drive.google.com/file/d/1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5/view?usp=sharing), [[baidu(code:ic0i)]](https://pan.baidu.com/s/1OJKrcQa_JP9zofC6ZtGBpw) | 90.0 | 83.3 | 422 | 29.6 |
+|ByteTrack_l_mot17 [[google]](https://drive.google.com/file/d/1XwfUuCBF4IgWBWK2H7oOhQgEj9Mrb3rz/view?usp=sharing), [[baidu(code:1cml)]](https://pan.baidu.com/s/1242adimKM6TYdeLU2qnuRA) | 88.7 | 80.7 | 460 | 43.7 |
+|ByteTrack_m_mot17 [[google]](https://drive.google.com/file/d/11Zb0NN_Uu7JwUd9e6Nk8o2_EUfxWqsun/view?usp=sharing), [[baidu(code:u3m4)]](https://pan.baidu.com/s/1fKemO1uZfvNSLzJfURO4TQ) | 87.0 | 80.1 | 477 | 54.1 |
+|ByteTrack_s_mot17 [[google]](https://drive.google.com/file/d/1z_WPNXyGNKMlulVDehN5pY__naDraE72/view?usp=sharing), [[baidu(code:qflm)]](https://pan.baidu.com/s/1PiP1kQfgxAIrnGUbFP6Wfg) | 79.2 | 74.3 | 533 | 64.5 |
 
 
 ### MOT20 test model
@@ -92,6 +92,8 @@ Train on CrowdHuman and MOT20, evaluate on MOT20 train
 
 
 ## Training
+
+The COCO pretrained YOLOX model can be downloaded from their [model zoo](https://github.com/Megvii-BaseDetection/YOLOX/tree/0.1.0). After downloading the pretrained models, you can put them under <ByteTrack_HOME>/pretrained. 
 
 * **Train ablation model (MOT17 half train and CrowdHuman)**
 
