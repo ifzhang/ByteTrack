@@ -2,6 +2,18 @@
 ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box
 <img src="assets/teasing.png" width="600"/>
 
+## Abstract
+Multi-object tracking (MOT) aims at estimating bounding boxes and identities of objects in videos. Most methods obtain identities by associating detection boxes in sequence. To filter out the background, previous methods only keep the boxes whose scores are higher than a threshold. However, the objects in low scores, \eg occluded objects, are simply thrown away and bring non-negligible missing detections and fragmented trajectories. To solve this problem, we present a simple, effective and generic detection-driven association method, called BYTE, tracking BY associaTing Every detection box instead of only the high score ones. We utilize the similarity with tracklets to recover the objects in low score detection boxes and filter out the background, simultaneously. We apply BYTE to 9 different state-of-the-art trackers and achieve consistent improvement on IDF1 score ranging from 1 to 10 points. To put forwards the state-of-the-art performance of MOT, we design a simple and strong tracker, named ByteTrack. For the first time, we achieve 80.3 MOTA, 77.3 IDF1 and 63.1 HOTA on the test set of MOT17 with 30 FPS running speed on a single V100 GPU.
+
+## Tracking performance
+### Results on MOT challenge test set
+| Dataset    |  MOTA | IDF1 | HOTA | IDS | MT | ML | FP | FN | FPS |
+|------------|-------|------|------|-------|-------|------|------|------|------|
+|MOT17       | 80.3 | 77.3 | 63.1 | 53.2% | 14.5% | 25491 | 83721 | 29.6 |
+|MOT20       | 77.8 | 75.2 | 61.3 | 69.2% | 9.5% | 26249 | 87594 | 13.7 |
+
+ All of the results are obtained on the [MOT challenge](https://motchallenge.net) evaluation server under the “private detector” protocol. We rank first among all the trackers on 2DMOT15, MOT16, MOT17 and  MOT20. The tracking speed of the entire system can reach up to **30 FPS**.
+
 ## Installation
 
 Step1. Install ByteTrack.
