@@ -76,10 +76,10 @@ Train on CrowdHuman, MOT17, Cityperson and ETHZ, evaluate on MOT17 train
 
 | Model    |  MOTA | IDF1 | IDs | FPS |
 |------------|-------|------|------|------|
-|ByteTrack_x | 90.0 | 83.3 | 422 | 29.6 |
-|ByteTrack_l | 88.7 | 80.7 | 460 | 43.7 |
-|ByteTrack_m | 87.0 | 80.1 | 477 | 54.1 |
-|ByteTrack_s | 79.2 | 74.3 | 533 | 64.5 |
+|ByteTrack_x_mot17 | 90.0 | 83.3 | 422 | 29.6 |
+|ByteTrack_l_mot17 | 88.7 | 80.7 | 460 | 43.7 |
+|ByteTrack_m_mot17 | 87.0 | 80.1 | 477 | 54.1 |
+|ByteTrack_s_mot17 | 79.2 | 74.3 | 533 | 64.5 |
 
 
 ### MOT20 test model
@@ -88,7 +88,7 @@ Train on CrowdHuman and MOT20, evaluate on MOT20 train
 
 | Model    |  MOTA | IDF1 | IDs | FPS |
 |------------|-------|------|------|------|
-|ByteTrack_x | 90.0 | 83.3 | 422 | 29.6 |
+|ByteTrack_x | 99.9 | 99.9 | 0 | 13.7 |
 
 
 ## Training
@@ -147,6 +147,8 @@ Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and yo
 * **Test on MOT20**
 
 For MOT20, you need to clip the bounding boxes inside the image. 
+
+Add clip operation in [line 134-135 in data_augment.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/data_augment.py#L134), [line 122-125 in mosaicdetection.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/datasets/mosaicdetection.py#L122), [line 217-225 in mosaicdetection.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/datasets/mosaicdetection.py#L217), [line 115-118 in boxes.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/utils/boxes.py#L115).
 
 Run ByteTrack:
 
