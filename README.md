@@ -59,6 +59,26 @@ datasets
             └——————eth07
 ```
 
+Then, you need to turn the datasets to COCO format and mix different training data:
+
+```shell
+cd <ByteTrack_HOME>
+python3 tools/convert_mot17_to_coco.py
+python3 tools/convert_mot20_to_coco.py
+python3 tools/convert_crowdhuman_to_coco.py
+python3 tools/convert_cityperson_to_coco.py
+python3 tools/convert_ethz_to_coco.py
+```
+
+Before mixing different datasets, you need to following the operations in [mix_xxx.py](https://github.com/ifzhang/ByteTrack/blob/c116dfc746f9ebe07d419caa8acba9b3acfa79a6/tools/mix_data_ablation.py#L6) to create data folder and link. Finally you can mix the training data:
+
+```shell
+cd <ByteTrack_HOME>
+python3 tools/mix_data_ablation.py
+python3 tools/mix_data_test_mot17.py
+python3 tools/mix_data_test_mot20.py
+```
+
 
 ## Model zoo
 
