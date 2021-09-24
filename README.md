@@ -90,13 +90,6 @@ Train on CrowdHuman and MOT20, evaluate on MOT20 train
 |------------|-------|------|------|------|
 |ByteTrack_x | 90.0 | 83.3 | 422 | 29.6 |
 
-```shell
-cd <ByteTrack_HOME>
-mkdir pretrained
-cd pretrained
-hdfs dfs -get hdfs://haruna/home/byte_arnold_hl_vc/zhangyifu/debug1/models/bytetrack_models.tar.gz
-tar -zxvf bytetrack_models.tar.gz
-```
 
 ## Training
 
