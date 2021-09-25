@@ -198,6 +198,30 @@ cd <ByteTrack_HOME>
 python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --fp16 --fuse --save_result
 ```
 
+## Deploy
+
+### TensorRT + Python
+
+* **Install TensorRT Toolkit**
+Please follow the [TensorRT Installation Guide](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html) and [torch2trt gitrepo](https://github.com/NVIDIA-AI-IOT/torch2trt) to install TensorRT and torch2trt.
+
+* **Convert model**
+
+You can convert the Pytorch model to TensorRT model by running:
+
+```shell
+python3 tools/trt.py -f exps/example/mot/yolox_s_mix_det.py -c pretrained/bytetrack_s_mot17.pth.tar
+```
+
+* **Run TensorRT demo**
+
+You can use the converted model_trt.pth to run TensorRT demo with **130 FPS**:
+
+```shell
+python3 tools/demo_track.py video -f exps/example/mot/yolox_s_mix_det.py --trt --save_result
+```
+
+
 ## Acknowledgement
 
 A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT), [TransTrack](https://github.com/PeizeSun/TransTrack). Many thanks for their wonderful works.
