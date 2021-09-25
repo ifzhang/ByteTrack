@@ -13,6 +13,10 @@ Multi-object tracking (MOT) aims at estimating bounding boxes and identities of 
 |MOT17       | 80.3 | 77.3 | 63.1 | 53.2% | 14.5% | 25491 | 83721 | 2196 | 29.6 |
 |MOT20       | 77.8 | 75.2 | 61.3 | 69.2% | 9.5%  | 26249 | 87594 | 1223 | 13.7 |
 
+### Visualization results on MOT challenge test set
+<img src="assets/MOT17-01-SDP.gif" width="400"/>   <img src="assets/MOT17-07-SDP.gif" width="400"/>
+<img src="assets/MOT20-06.gif" width="400"/>   <img src="assets/MOT20-08.gif" width="400"/>
+
 ## Installation
 
 Step1. Install ByteTrack.
