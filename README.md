@@ -15,7 +15,7 @@ Multi-object tracking (MOT) aims at estimating bounding boxes and identities of 
 
 ### Visualization results on MOT challenge test set
 <img src="assets/MOT17-01-SDP.gif" width="400"/>   <img src="assets/MOT17-07-SDP.gif" width="400"/>
-<img src="assets/MOT20-06.gif" width="400"/>   <img src="assets/MOT20-08.gif" width="400"/>
+<img src="assets/MOT20-07.gif" width="400"/>   <img src="assets/MOT20-08.gif" width="400"/>
 
 ## Installation
 
