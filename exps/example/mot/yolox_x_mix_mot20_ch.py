@@ -17,9 +17,10 @@ class Exp(MyExp):
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         self.train_ann = "train.json"
         self.val_ann = "test.json"   # change to train.json when running on training set
-        self.input_size = (800, 1440)
-        self.test_size = (800, 1440)
-        self.random_size = (18, 32)
+        self.input_size = (896, 1600)
+        #self.test_size = (896, 1600)
+        self.test_size = (736, 1920)
+        self.random_size = (20, 36)
         self.max_epoch = 80
         self.print_interval = 20
         self.eval_interval = 5
@@ -47,7 +48,7 @@ class Exp(MyExp):
             preproc=TrainTransform(
                 rgb_means=(0.485, 0.456, 0.406),
                 std=(0.229, 0.224, 0.225),
-                max_labels=500,
+                max_labels=600,
             ),
         )
 
@@ -58,7 +59,7 @@ class Exp(MyExp):
             preproc=TrainTransform(
                 rgb_means=(0.485, 0.456, 0.406),
                 std=(0.229, 0.224, 0.225),
-                max_labels=1000,
+                max_labels=1200,
             ),
             degrees=self.degrees,
             translate=self.translate,
