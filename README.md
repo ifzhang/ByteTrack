@@ -112,7 +112,7 @@ Train on CrowdHuman and MOT20, evaluate on MOT20 train
 
 | Model    |  MOTA | IDF1 | IDs | FPS |
 |------------|-------|------|------|------|
-|ByteTrack_x | 99.9 | 99.9 | 0 | 13.7 |
+|ByteTrack_x | 93.4 | 89.3 | 1057 | 17.5 |
 
 
 ## Training
