@@ -207,7 +207,7 @@ Please follow the [TensorRT Installation Guide](https://docs.nvidia.com/deeplear
 
 * **Convert model**
 
-You can convert the Pytorch model to TensorRT model by running:
+You can convert the Pytorch model 'bytetrack_s_mot17' to TensorRT model by running:
 
 ```shell
 python3 tools/trt.py -f exps/example/mot/yolox_s_mix_det.py -c pretrained/bytetrack_s_mot17.pth.tar
@@ -224,4 +224,4 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_s_mix_det.py --trt -
 
 ## Acknowledgement
 
-A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT), [TransTrack](https://github.com/PeizeSun/TransTrack). Many thanks for their wonderful works.
+A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT) and [TransTrack](https://github.com/PeizeSun/TransTrack). Many thanks for their wonderful works.
