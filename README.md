@@ -207,7 +207,7 @@ Please follow the [TensorRT Installation Guide](https://docs.nvidia.com/deeplear
 
 * **Convert model**
 
-You can convert the Pytorch model 'bytetrack_s_mot17' to TensorRT model by running:
+You can convert the Pytorch model “bytetrack_s_mot17” to TensorRT model by running:
 
 ```shell
 python3 tools/trt.py -f exps/example/mot/yolox_s_mix_det.py -c pretrained/bytetrack_s_mot17.pth.tar
