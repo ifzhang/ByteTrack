@@ -168,8 +168,6 @@ def main(exp, args, num_gpu):
     logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
     #logger.info("Model Structure:\n{}".format(str(model)))
 
-    #evaluator = exp.get_evaluator(args.batch_size, is_distributed, args.test)
-
     val_loader = exp.get_eval_loader(args.batch_size, is_distributed, args.test)
     evaluator = MOTEvaluator(
         args=args,
@@ -231,8 +229,10 @@ def main(exp, args, num_gpu):
     else:
         gt_type = ''
     print('gt_type', gt_type)
-    gtfiles = glob.glob(
-      os.path.join('datasets/mot/train', '*/gt/gt{}.txt'.format(gt_type)))
+    if args.mot20:
+        gtfiles = glob.glob(os.path.join('datasets/MOT20/train', '*/gt/gt{}.txt'.format(gt_type)))
+    else:
+        gtfiles = glob.glob(os.path.join('datasets/mot/train', '*/gt/gt{}.txt'.format(gt_type)))
     print('gt_files', gtfiles)
     tsfiles = [f for f in glob.glob(os.path.join(results_folder, '*.txt')) if not os.path.basename(f).startswith('eval')]
 
