@@ -170,13 +170,6 @@ class DETTracker(object):
         scale = min(img_size[0] / float(img_h), img_size[1] / float(img_w))
         bboxes /= scale
 
-        # self.args.track_thresh = 0.6
-        # low_thresh = 0.2
-        # self.det_thresh = self.args.track_thresh + np.var(scores)
-        # remain_inds = scores > self.args.track_thresh
-        # inds_low = scores > low_thresh
-        # inds_high = scores < self.args.track_thresh
-
         remain_inds = scores > self.args.track_thresh
         inds_low = scores > 0.1
         inds_high = scores < self.args.track_thresh
@@ -186,23 +179,6 @@ class DETTracker(object):
         dets = bboxes[remain_inds]
         scores_keep = scores[remain_inds]
         scores_second = scores[inds_second]
-
-        #print(np.mean(scores), np.var(scores), np.std(scores))
-
-        #print(scores)
-        #print(scores.shape, scores_keep.shape, scores_second.shape, scores_high.shape)
-
-        # vis
-        '''
-        for i in range(0, dets.shape[0]):
-            bbox = dets[i][0:4]
-            cv2.rectangle(img0, (bbox[0], bbox[1]),
-                          (bbox[2], bbox[3]),
-                          (0, 255, 0), 2)
-        cv2.imshow('dets', img0)
-        cv2.waitKey(0)
-        id0 = id0-1
-        '''
 
         if len(dets) > 0:
             '''Detections'''
@@ -220,13 +196,13 @@ class DETTracker(object):
             else:
                 tracked_stracks.append(track)
 
-        ''' Step 2: First association, with Kalman and IOU'''
+        ''' Step 2: First association, with high score detection boxes'''
         strack_pool = joint_stracks(tracked_stracks, self.lost_stracks)
         # Predict the current location with KF
         STrack.multi_predict(strack_pool)
         dists = matching.iou_distance(strack_pool, detections)
-        dists = matching.fuse_score(dists, detections)
-        #dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
+        if not self.args.mot20:
+            dists = matching.fuse_score(dists, detections)
         matches, u_track, u_detection = matching.linear_assignment(dists, thresh=self.args.match_thresh)
 
         for itracked, idet in matches:
@@ -239,7 +215,7 @@ class DETTracker(object):
                 track.re_activate(det, self.frame_id, new_id=False)
                 refind_stracks.append(track)
 
-        ''' Step 3: Second association, with IOU'''
+        ''' Step 3: Second association, with low score detection boxes'''
         # association the untrack to the low score detections
         if len(dets_second) > 0:
             '''Detections'''
@@ -261,7 +237,6 @@ class DETTracker(object):
                 refind_stracks.append(track)
 
         for it in u_track:
-            #track = r_tracked_stracks[it]
             track = r_tracked_stracks[it]
             if not track.state == TrackState.Lost:
                 track.mark_lost()
@@ -270,7 +245,8 @@ class DETTracker(object):
         '''Deal with unconfirmed tracks, usually tracks with only one beginning frame'''
         detections = [detections[i] for i in u_detection]
         dists = matching.iou_distance(unconfirmed, detections)
-        dists = matching.fuse_score(dists, detections)
+        if not self.args.mot20:
+            dists = matching.fuse_score(dists, detections)
         matches, u_unconfirmed, u_detection = matching.linear_assignment(dists, thresh=0.7)
         for itracked, idet in matches:
             unconfirmed[itracked].update(detections[idet], self.frame_id)
@@ -348,15 +324,3 @@ def remove_duplicate_stracks(stracksa, stracksb):
     resa = [t for i, t in enumerate(stracksa) if not i in dupa]
     resb = [t for i, t in enumerate(stracksb) if not i in dupb]
     return resa, resb
-
-
-def remove_fp_stracks(stracksa, n_frame=10):
-    remain = []
-    for t in stracksa:
-        score_5 = t.score_list[-n_frame:]
-        score_5 = np.array(score_5, dtype=np.float32)
-        index = score_5 < 0.45
-        num = np.sum(index)
-        if num < n_frame:
-            remain.append(t)
-    return remain
