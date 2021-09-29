@@ -357,7 +357,7 @@ const float color_list[80][3] =
     {0.50, 0.5, 0}
 };
 
-static void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects, std::string f)
+cv::Mat draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects, std::string f)
 {
     static const char* class_names[] = {
         "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
@@ -414,10 +414,11 @@ static void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects,
                     cv::FONT_HERSHEY_SIMPLEX, 0.4, txt_color, 1);
     }
 
-    cv::imwrite("det_res.jpg", image);
-    fprintf(stderr, "save vis file\n");
+    //cv::imwrite("det_res.jpg", image);
+    //fprintf(stderr, "save vis file\n");
     /* cv::imshow("image", image); */
     /* cv::waitKey(0); */
+    return image;
 }
 
 
@@ -484,7 +485,7 @@ int main(int argc, char** argv) {
         std::cerr << "./yolox ../model_trt.engine -i ../../../assets/dog.jpg  // deserialize file and run inference" << std::endl;
         return -1;
     }
-    const std::string input_image_path {argv[3]};
+    const std::string input_video_path {argv[3]};
 
     //std::vector<std::string> file_names;
     //if (read_files_in_dir(argv[2], file_names) < 0) {
@@ -505,30 +506,49 @@ int main(int argc, char** argv) {
         output_size *= out_dims.d[j];
     }
     static float* prob = new float[output_size];
-    
-    cv::Mat img = cv::imread(input_image_path);
-    int img_w = img.cols;
-    int img_h = img.rows;
-    
-    cv::Mat pr_img = static_resize(img);
-    std::cout << "blob image" << std::endl;
-    
-    float* blob;
-    blob = blobFromImage(pr_img);
-    float scale = std::min(INPUT_W / (img.cols*1.0), INPUT_H / (img.rows*1.0));
-    
-    // run inference
-    auto start = std::chrono::system_clock::now();
-    doInference(*context, blob, prob, output_size, pr_img.size());
-    auto end = std::chrono::system_clock::now();
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << std::endl;
 
-    std::vector<Object> objects;
-    decode_outputs(prob, objects, scale, img_w, img_h);
-    draw_objects(img, objects, input_image_path);
+    cv::VideoCapture cap(input_video_path);
+	if (!cap.isOpened())
+		return 0;
 
-    delete blob;
+	int img_w = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+	int img_h = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+    int fps = cap.get(CV_CAP_PROP_FPS);
 
+    cv::VideoWriter writer("demo.mp4", CV_FOURCC('m', 'p', '4', 'v'), fps, cv::Size(img_w, img_h));
+
+    cv::Mat img;
+	while (true)
+    {
+        cap >> img;
+		if (img.empty())
+			break;
+        cv::Mat pr_img = static_resize(img);
+        std::cout << "blob image" << std::endl;
+        
+        float* blob;
+        blob = blobFromImage(pr_img);
+        float scale = std::min(INPUT_W / (img.cols*1.0), INPUT_H / (img.rows*1.0));
+        
+        // run inference
+        auto start = std::chrono::system_clock::now();
+        doInference(*context, blob, prob, output_size, pr_img.size());
+        auto end = std::chrono::system_clock::now();
+        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << std::endl;
+
+        std::vector<Object> objects;
+        decode_outputs(prob, objects, scale, img_w, img_h);
+        cv::Mat img_res = draw_objects(img, objects, input_video_path);
+        writer.write(img_res);
+
+        delete blob;
+        char c = cv::waitKey(20);
+        if (c == 27)
+        {
+            break;
+        }
+
+    }
     // destroy the engine
     context->destroy();
     engine->destroy();
