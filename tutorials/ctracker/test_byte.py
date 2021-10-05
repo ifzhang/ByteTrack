@@ -19,7 +19,7 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, models, transforms
 from dataloader import CSVDataset, collater, Resizer, AspectRatioBasedSampler, Augmenter, UnNormalizer, Normalizer, RGB_MEAN, RGB_STD
 from scipy.optimize import linear_sum_assignment
-from tracker import DETTracker
+from tracker import BYTETracker
 
 
 def write_results(filename, results):
@@ -68,7 +68,7 @@ def run_each_dataset(model_dir, retinanet, dataset_path, subset, cur_dataset):
     img_height = 1080
     fps = 30
 
-    tracker = DETTracker()
+    tracker = BYTETracker()
 
     for idx in range((int(img_len / 2)), img_len + 1):
         i = idx - 1

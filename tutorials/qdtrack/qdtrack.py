@@ -5,7 +5,7 @@ from mmdet.models import TwoStageDetector
 from qdtrack.core import track2result
 from ..builder import MODELS, build_tracker
 from qdtrack.core import imshow_tracks, restore_result
-from tracker import DETTracker
+from tracker import BYTETracker
 
 
 @MODELS.register_module()
@@ -37,7 +37,7 @@ class QDTrack(TwoStageDetector):
 
     def init_tracker(self):
 #         self.tracker = build_tracker(self.tracker_cfg)
-        self.tracker = DETTracker()
+        self.tracker = BYTETracker()
     
     def forward_train(self,
                       img,

@@ -45,7 +45,7 @@ import shutil
 
 from detectron2.structures import Instances
 
-from tracker import DETTracker
+from tracker import BYTETracker
 
 np.random.seed(2020)
 
@@ -166,7 +166,7 @@ def write_results(filename, results):
 
 class MOTR(object):
     def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3):
-        self.tracker = DETTracker()
+        self.tracker = BYTETracker()
 
     def update(self, dt_instances: Instances):
         ret = []
