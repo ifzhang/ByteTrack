@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(yolox)
+project(bytetrack)
 
 add_definitions(-std=c++11)
 
@@ -11,6 +11,8 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(CUDA REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(/usr/local/include/eigen3)
+link_directories(${PROJECT_SOURCE_DIR}/include)
 # include and link dirs of cuda and tensorrt, you need adapt them if yours are different
 # cuda
 include_directories(/usr/local/cuda/include)
@@ -27,7 +29,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Ofast -Wfatal-errors -
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-add_executable(bytetrack ${PROJECT_SOURCE_DIR}/bytetrack.cpp)
+file(GLOB My_Source_Files ${PROJECT_SOURCE_DIR}/src/*.cpp)
+add_executable(bytetrack ${My_Source_Files})
 target_link_libraries(bytetrack nvinfer)
 target_link_libraries(bytetrack cudart)
 target_link_libraries(bytetrack ${OpenCV_LIBS})

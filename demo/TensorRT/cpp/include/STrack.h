@@ -7,8 +7,6 @@ date: 08/19/2021
 #pragma once
 
 #include <opencv2/opencv.hpp>
-#include <torch/torch.h>
-#include <torch/script.h>
 #include "kalmanFilter.h"
 
 using namespace cv;
@@ -19,7 +17,7 @@ enum TrackState { New = 0, Tracked, Lost, Removed };
 class STrack
 {
 public:
-	STrack(vector<float> tlwh_, float score, vector<float> temp_feat, int buffer_size=30);
+	STrack(vector<float> tlwh_, float score, int buffer_size=30);
 	~STrack();
 
 	vector<float> static tlbr_to_tlwh(vector<float> &tlbr);
@@ -35,15 +33,12 @@ public:
 	
 	void activate(byte_kalman::KalmanFilter &kalman_filter, int frame_id);
 	void re_activate(STrack &new_track, int frame_id, bool new_id = false);
-	void update(STrack &new_track, int frame_id, bool update_feature = true);
+	void update(STrack &new_track, int frame_id);
 
 public:
 	bool is_activated;
 	int track_id;
 	int state;
-	vector<float> curr_feat;
-	vector<float> smooth_feat;
-	float alpha;
 
 	vector<float> _tlwh;
 	vector<float> tlwh;
@@ -57,6 +52,5 @@ public:
 	float score;
 
 private:
-	void update_features(vector<float> temp_feat);
 	byte_kalman::KalmanFilter kalman_filter;
 };
