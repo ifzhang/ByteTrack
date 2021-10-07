@@ -36,8 +36,6 @@ private:
 
 private:
 
-	int net_width;
-	int net_height;
 	float track_thresh;
 	float high_thresh;
 	float match_thresh;
