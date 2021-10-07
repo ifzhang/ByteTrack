@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# output
+docs/api
+.code-workspace.code-workspace
+*.pkl
+*.npy
+*.pth
+*.onnx
+*.engine
+events.out.tfevents*
