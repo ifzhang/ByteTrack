@@ -40,7 +40,6 @@ private:
 	int net_height;
 	float track_thresh;
 	float high_thresh;
-	float low_thresh;
 	float match_thresh;
 	int frame_id;
 	int max_time_lost;

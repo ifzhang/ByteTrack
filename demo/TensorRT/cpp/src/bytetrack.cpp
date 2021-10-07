@@ -409,18 +409,13 @@ int main(int argc, char** argv) {
         }
     } else {
         std::cerr << "arguments not right!" << std::endl;
-        std::cerr << "run 'python3 yolox/deploy/trt.py -n yolox-{tiny, s, m, l, x}' to serialize model first!" << std::endl;
+        std::cerr << "run 'python3 tools/trt.py -f exps/example/mot/yolox_s_mix_det.py -c pretrained/bytetrack_s_mot17.pth.tar' to serialize model first!" << std::endl;
         std::cerr << "Then use the following command:" << std::endl;
-        std::cerr << "./yolox ../model_trt.engine -i ../../../assets/dog.jpg  // deserialize file and run inference" << std::endl;
+        std::cerr << "cd demo/TensorRT/cpp/build" << std::endl;
+        std::cerr << "./bytetrack ../../../../YOLOX_outputs/yolox_s_mix_det/model_trt.engine -i ../../../../videos/palace.mp4  // deserialize file and run inference" << std::endl;
         return -1;
     }
     const std::string input_video_path {argv[3]};
-
-    //std::vector<std::string> file_names;
-    //if (read_files_in_dir(argv[2], file_names) < 0) {
-        //std::cout << "read_files_in_dir failed." << std::endl;
-        //return -1;
-    //}
 
     IRuntime* runtime = createInferRuntime(gLogger);
     assert(runtime != nullptr);
@@ -443,17 +438,20 @@ int main(int argc, char** argv) {
 	int img_w = cap.get(CV_CAP_PROP_FRAME_WIDTH);
 	int img_h = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
     int fps = cap.get(CV_CAP_PROP_FPS);
+    long nFrame = static_cast<long>(cap.get(CV_CAP_PROP_FRAME_COUNT));
+    std::cout << nFrame << std::endl;
 
     cv::VideoWriter writer("demo.mp4", CV_FOURCC('m', 'p', '4', 'v'), fps, cv::Size(img_w, img_h));
 
     cv::Mat img;
-    BYTETracker tracker(30, 30);
+    BYTETracker tracker(fps, 30);
     int num_frames = 0;
     int total_ms = 0;
 	while (true)
     {
-        cap >> img;
-        num_frames = num_frames + 1;
+        if(!cap.read(img))
+            break;
+        num_frames ++;
         if (num_frames % 20 == 0)
         {
             std::cout << "Processing frame " << num_frames << " (" << num_frames * 1000000 / total_ms << " fps)" << std::endl;
@@ -483,20 +481,23 @@ int main(int argc, char** argv) {
 			if (tlwh[2] * tlwh[3] > 20 && !vertical)
 			{
 				Scalar s = tracker.get_color(output_stracks[i].track_id);
-				rectangle(img, Rect(tlwh[0], tlwh[1], tlwh[2], tlwh[3]), s, 2);
-				//putText(img, to_string(output_stracks[i].track_id), Point(tlwh[0], tlwh[1]), 0, 0.6, s, 2);
+				putText(img, cv::format("%d", output_stracks[i].track_id), Point(tlwh[0], tlwh[1] - 5), 
+                        0, 0.6, cv::Scalar(0, 0, 255), 2, CV_AA);
+                rectangle(img, Rect(tlwh[0], tlwh[1], tlwh[2], tlwh[3]), s, 2);
 			}
 		}
+        putText(img, format("frame: %d fps: %d num: %d", num_frames, num_frames * 1000000 / total_ms, output_stracks.size()), 
+                Point(0, 30), 0, 0.6, cv::Scalar(0, 0, 255), 2, CV_AA);
         writer.write(img);
 
         delete blob;
-        char c = cv::waitKey(20);
-        if (c == 27)
+        char c = cv::waitKey(1);
+        if (c > 0)
         {
             break;
         }
-
     }
+    cap.release();
     std::cout << "FPS: " << num_frames * 1000000 / total_ms << std::endl;
     // destroy the engine
     context->destroy();

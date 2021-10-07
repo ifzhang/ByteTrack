@@ -137,7 +137,7 @@ void BYTETracker::linear_assignment(vector<vector<float> > &cost_matrix, int cos
 	}
 
 	vector<int> rowsol; vector<int> colsol;
-	float c = lapjv(cost_matrix, rowsol, colsol, true, 0.7);
+	float c = lapjv(cost_matrix, rowsol, colsol, true, thresh);
 	for (int i = 0; i < rowsol.size(); i++)
 	{
 		if (rowsol[i] >= 0)

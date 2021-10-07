@@ -5,9 +5,8 @@ BYTETracker::BYTETracker(int frame_rate, int track_buffer)
 {
 	net_width = 1088;
 	net_height = 608;
-	track_thresh = 0.6;
-	high_thresh = 0.7;
-	low_thresh = 0.1;
+	track_thresh = 0.5;
+	high_thresh = 0.6;
 	match_thresh = 0.8;
 
 	frame_id = 0;
@@ -54,7 +53,7 @@ vector<STrack> BYTETracker::update(const vector<Object>& objects)
 
 			float score = objects[i].prob;
 
-			STrack strack(STrack::tlbr_to_tlwh(tlbr_), score, 30);
+			STrack strack(STrack::tlbr_to_tlwh(tlbr_), score);
 			if (score >= track_thresh)
 			{
 				detections.push_back(strack);

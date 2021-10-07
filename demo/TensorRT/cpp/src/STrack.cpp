@@ -1,6 +1,6 @@
 #include "STrack.h"
 
-STrack::STrack(vector<float> tlwh_, float score, int buffer_size)
+STrack::STrack(vector<float> tlwh_, float score)
 {
 	_tlwh.resize(4);
 	_tlwh.assign(tlwh_.begin(), tlwh_.end());
