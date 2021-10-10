@@ -62,12 +62,18 @@ YoloV5Focus      focus                    1 1 images 503
 
 ## Use ncnn_optimize to generate new param and bin
 ```shell
-# suppose you are still under ncnn/build/tools/onnx dir.
+# suppose you are still under <path of ncnn>/build/tools/onnx dir.
 ../ncnnoptimize bytetrack_s.param bytetrack_s.bin bytetrack_s_op.param bytetrack_s_op.bin 65536
 ```
 
-## Copy code to ncnn
-Copy or Move src, include folders and CMakeLists.txt into ncnn/examples, then build bytetrack
+## Copy files and build ByteTrack
+Copy or move 'src', 'include' folders and 'CMakeLists.txt' file into <path of ncnn>/examples. Copy bytetrack_s_op.param, bytetrack_s_op.bin and <ByteTrack_HOME>/videos/palace.mp4 into <path of ncnn>/build/examples. Then, build ByteTrack:
+
+```shell
+cd <path of ncnn>/build/examples
+cmake ..
+make
+```
 
 ## Run the demo
 ```shell
