@@ -1,9 +1,3 @@
-/*
-author: samylee
-github: https://github.com/samylee
-date: 08/19/2021
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
