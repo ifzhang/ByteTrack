@@ -14,11 +14,10 @@ python3 tools/export_onnx.py -f exps/example/mot/yolox_s_mix_det.py -c pretraine
 Then, a bytetrack_s.onnx file is generated under <ByteTrack_HOME>.
 
 ## Generate ncnn param and bin file
-Put bytetrack_s.onnx under <path of ncnn>/build/tools/onnx and then run: 
+Put bytetrack_s.onnx under ncnn/build/tools/onnx and then run: 
 
 ```shell
-cd <path of ncnn>
-cd build/tools/onnx
+cd ncnn/build/tools/onnx
 ./onnx2ncnn bytetrack_s.onnx bytetrack_s.param bytetrack_s.bin
 ```
 
@@ -62,15 +61,15 @@ YoloV5Focus      focus                    1 1 images 503
 
 ## Use ncnn_optimize to generate new param and bin
 ```shell
-# suppose you are still under <path of ncnn>/build/tools/onnx dir.
+# suppose you are still under ncnn/build/tools/onnx dir.
 ../ncnnoptimize bytetrack_s.param bytetrack_s.bin bytetrack_s_op.param bytetrack_s_op.bin 65536
 ```
 
 ## Copy files and build ByteTrack
-Copy or move 'src', 'include' folders and 'CMakeLists.txt' file into <path of ncnn>/examples. Copy bytetrack_s_op.param, bytetrack_s_op.bin and <ByteTrack_HOME>/videos/palace.mp4 into <path of ncnn>/build/examples. Then, build ByteTrack:
+Copy or move 'src', 'include' folders and 'CMakeLists.txt' file into ncnn/examples. Copy bytetrack_s_op.param, bytetrack_s_op.bin and <ByteTrack_HOME>/videos/palace.mp4 into ncnn/build/examples. Then, build ByteTrack:
 
 ```shell
-cd <path of ncnn>/build/examples
+cd ncnn/build/examples
 cmake ..
 make
 ```
