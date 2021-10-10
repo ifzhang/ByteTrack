@@ -1,82 +1,77 @@
-# YOLOX-CPP-ncnn
+# ByteTrack-CPP-ncnn
 
-Cpp file compile of YOLOX object detection base on [ncnn](https://github.com/Tencent/ncnn).  
-YOLOX is included in ncnn now, you could also try building from ncnn, it's better.
+## Installation
 
-## Tutorial
-
-### Step1
 Clone [ncnn](https://github.com/Tencent/ncnn) first, then please following [build tutorial of ncnn](https://github.com/Tencent/ncnn/wiki/how-to-build) to build on your own device.
 
-### Step2
+## Generate onnx file
 Use provided tools to generate onnx file.
-For example, if you want to generate onnx file of yolox-s, please run the following command:
+For example, if you want to generate onnx file of bytetrack_s_mot17.pth, please run the following command:
 ```shell
-cd <path of yolox>
-python3 tools/export_onnx.py -n yolox-s
+cd <ByteTrack_HOME>
+python3 tools/export_onnx.py -f exps/example/mot/yolox_s_mix_det.py -c pretrained/bytetrack_s_mot17.pth.tar
 ```
-Then, a yolox.onnx file is generated.
+Then, a bytetrack_s.onnx file is generated under <ByteTrack_HOME>.
 
-### Step3
-Generate ncnn param and bin file.
+## Generate ncnn param and bin file
+Put bytetrack_s.onnx under <path of ncnn>/build/tools/onnx and then run: 
+
 ```shell
 cd <path of ncnn>
-cd build/tools/ncnn
-./onnx2ncnn yolox.onnx yolox.param yolox.bin
+cd build/tools/onnx
+./onnx2ncnn bytetrack_s.onnx bytetrack_s.param bytetrack_s.bin
 ```
 
 Since Focus module is not supported in ncnn. Warnings like:
 ```shell
 Unsupported slice step ! 
 ```
-will be printed. However, don't  worry!  C++ version of Focus layer is already implemented in yolox.cpp.
-
-### Step4
-Open **yolox.param**, and modify it.
+will be printed. However, don't  worry!  C++ version of Focus layer is already implemented in src/bytetrack.cpp.
+  
+## Modify param file
+Open **bytetrack_s.param**, and modify it.
 Before (just an example):
 ```
-295 328
+235 268
 Input            images                   0 1 images
 Split            splitncnn_input0         1 4 images images_splitncnn_0 images_splitncnn_1 images_splitncnn_2 images_splitncnn_3
-Crop             Slice_4                  1 1 images_splitncnn_3 647 -23309=1,0 -23310=1,2147483647 -23311=1,1
-Crop             Slice_9                  1 1 647 652 -23309=1,0 -23310=1,2147483647 -23311=1,2
-Crop             Slice_14                 1 1 images_splitncnn_2 657 -23309=1,0 -23310=1,2147483647 -23311=1,1
-Crop             Slice_19                 1 1 657 662 -23309=1,1 -23310=1,2147483647 -23311=1,2
-Crop             Slice_24                 1 1 images_splitncnn_1 667 -23309=1,1 -23310=1,2147483647 -23311=1,1
-Crop             Slice_29                 1 1 667 672 -23309=1,0 -23310=1,2147483647 -23311=1,2
-Crop             Slice_34                 1 1 images_splitncnn_0 677 -23309=1,1 -23310=1,2147483647 -23311=1,1
-Crop             Slice_39                 1 1 677 682 -23309=1,1 -23310=1,2147483647 -23311=1,2
-Concat           Concat_40                4 1 652 672 662 682 683 0=0
+Crop             Slice_4                  1 1 images_splitncnn_3 467 -23309=1,0 -23310=1,2147483647 -23311=1,1
+Crop             Slice_9                  1 1 467 472 -23309=1,0 -23310=1,2147483647 -23311=1,2
+Crop             Slice_14                 1 1 images_splitncnn_2 477 -23309=1,0 -23310=1,2147483647 -23311=1,1
+Crop             Slice_19                 1 1 477 482 -23309=1,1 -23310=1,2147483647 -23311=1,2
+Crop             Slice_24                 1 1 images_splitncnn_1 487 -23309=1,1 -23310=1,2147483647 -23311=1,1
+Crop             Slice_29                 1 1 487 492 -23309=1,0 -23310=1,2147483647 -23311=1,2
+Crop             Slice_34                 1 1 images_splitncnn_0 497 -23309=1,1 -23310=1,2147483647 -23311=1,1
+Crop             Slice_39                 1 1 497 502 -23309=1,1 -23310=1,2147483647 -23311=1,2
+Concat           Concat_40                4 1 472 492 482 502 503 0=0
 ...
 ```
-* Change first number for 295 to 295 - 9 = 286(since we will remove 10 layers and add 1 layers, total layers number should minus 9). 
-* Then remove 10 lines of code from Split to Concat, but remember the last but 2nd number: 683.
-* Add YoloV5Focus layer After Input (using previous number 683):
+* Change first number for 235 to 235 - 9 = 226(since we will remove 10 layers and add 1 layers, total layers number should minus 9). 
+* Then remove 10 lines of code from Split to Concat, but remember the last but 2nd number: 503.
+* Add YoloV5Focus layer After Input (using previous number 503):
 ```
-YoloV5Focus      focus                    1 1 images 683
+YoloV5Focus      focus                    1 1 images 503
 ```
 After(just an exmaple):
 ```
-286 328
+226 328
 Input            images                   0 1 images
-YoloV5Focus      focus                    1 1 images 683
+YoloV5Focus      focus                    1 1 images 503
 ...
 ```
 
-### Step5
-Use ncnn_optimize to generate new param and bin:
+## Use ncnn_optimize to generate new param and bin
 ```shell
-# suppose you are still under ncnn/build/tools/ncnn dir.
-../ncnnoptimize model.param model.bin yolox.param yolox.bin 65536
+# suppose you are still under ncnn/build/tools/onnx dir.
+../ncnnoptimize bytetrack_s.param bytetrack_s.bin bytetrack_s_op.param bytetrack_s_op.bin 65536
 ```
 
-### Step6
-Copy or Move yolox.cpp file into ncnn/examples, modify the CMakeList.txt, then build yolox
+## Copy code to ncnn
+Copy or Move src, include folders and CMakeLists.txt into ncnn/examples, then build bytetrack
 
-### Step7
-Inference image with executable file yolox, enjoy the detect result:
+## Run the demo
 ```shell
-./yolox demo.jpg
+./bytetrack palace.mp4
 ```
 
 ## Acknowledgement
