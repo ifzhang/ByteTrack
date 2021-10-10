@@ -1,4 +1,4 @@
-### ByteTrack-TensorRT in Python
+# ByteTrack-TensorRT in Python
 
 * **Install TensorRT Toolkit**
 Please follow the [TensorRT Installation Guide](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html) and [torch2trt gitrepo](https://github.com/NVIDIA-AI-IOT/torch2trt) to install TensorRT (Version 7 recommended) and torch2trt.
