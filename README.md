@@ -202,10 +202,11 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pret
 
 ## Deploy
 
-1.  [TensorRT in Python](./demo/TensorRT/python)
-2.  [TensorRT in C++](./demo/TensorRT/cpp)
-3.  [ncnn in C++](./demo/ncnn/cpp)
-4.  [ONNX export and an ONNXRuntime](./demo/ONNXRuntime)
+1.  [ONNX export and an ONNXRuntime](./demo/ONNXRuntime)
+2.  [TensorRT in Python](./demo/TensorRT/python)
+3.  [TensorRT in C++](./demo/TensorRT/cpp)
+4.  [ncnn in C++](./demo/ncnn/cpp)
+
 
 
 ## Acknowledgement
