@@ -1,9 +1,3 @@
-/*
-author: samylee
-github: https://github.com/samylee
-date: 08/19/2021
-*/
-
 #pragma once
 
 #include <cstddef>

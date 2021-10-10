@@ -1,18 +1,3 @@
-// This file is wirtten base on the following file:
-// https://github.com/Tencent/ncnn/blob/master/examples/yolov5.cpp
-// Copyright (C) 2020 THL A29 Limited, a Tencent company. All rights reserved.
-// Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
-// in compliance with the License. You may obtain a copy of the License at
-//
-// https://opensource.org/licenses/BSD-3-Clause
-//
-// Unless required by applicable law or agreed to in writing, software distributed
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the
-// specific language governing permissions and limitations under the License.
-// ------------------------------------------------------------------------------
-// Copyright (C) 2020-2021, Megvii Inc. All rights reserved.
-
 #include "layer.h"
 #include "net.h"
 
@@ -33,8 +18,8 @@
 
 #define YOLOX_NMS_THRESH  0.7 // nms threshold
 #define YOLOX_CONF_THRESH 0.1 // threshold of bounding box prob
-#define INPUT_W 1088  // target image size after resize, might use 416 for small model
-#define INPUT_H 608
+#define INPUT_W 1088  // target image size w after resize
+#define INPUT_H 608   // target image size h after resize
 
 Mat static_resize(Mat& img) {
     float r = min(INPUT_W / (img.cols*1.0), INPUT_H / (img.rows*1.0));
@@ -330,13 +315,10 @@ int main(int argc, char** argv)
     // Focus in yolov5
     yolox.register_custom_layer("YoloV5Focus", YoloV5Focus_layer_creator);
 
-    // original pretrained model from https://github.com/Megvii-BaseDetection/YOLOX
-    // ncnn model param: https://github.com/Megvii-BaseDetection/storage/releases/download/0.0.1/yolox_s_ncnn.tar.gz
     yolox.load_param("bytetrack_s_op.param");
     yolox.load_model("bytetrack_s_op.bin");
     
     ncnn::Extractor ex = yolox.create_extractor();
-    //ex.set_num_threads(20);
 
     const char* videopath = argv[1];
 
