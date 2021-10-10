@@ -14,6 +14,6 @@ python3 track_half.py --cfg ./cfg/yolov3_1088x608.cfg --weights weights/mix_mot1
 
 
 ## Notes
-motion_tracker: only motion
+byte_tracker: only motion
 
 tracker: motion + reid

@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import numpy as np
 from sklearn.utils.linear_assignment_ import linear_assignment
-# from numba import jit
 import copy
 from .mot_online.kalman_filter import KalmanFilter
 from .mot_online.basetrack import BaseTrack, TrackState
@@ -144,10 +143,9 @@ class STrack(BaseTrack):
 
 
 
-class Tracker(object):
+class BYTETracker(object):
     def __init__(self, args, frame_rate=30):
         self.args = args
-        #self.det_thresh = args.track_thresh
         self.det_thresh = args.new_thresh
         self.buffer_size = int(frame_rate / 30.0 * args.track_buffer)
         self.max_time_lost = self.buffer_size
@@ -222,7 +220,7 @@ class Tracker(object):
         STrack.multi_predict(strack_pool)
         dists = matching.iou_distance(strack_pool, detections)
         #dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.9)
+        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=self.args.match_thresh)
 
         for itracked, idet in matches:
             track = strack_pool[itracked]
@@ -243,7 +241,7 @@ class Tracker(object):
             detections_second = []
         r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
         dists = matching.iou_distance(r_tracked_stracks, detections_second)
-        matches, u_track, u_detection_second = matching.linear_assignment(dists, thresh=0.4)
+        matches, u_track, u_detection_second = matching.linear_assignment(dists, thresh=0.5)
         for itracked, idet in matches:
             track = r_tracked_stracks[itracked]
             det = detections_second[idet]
@@ -255,7 +253,6 @@ class Tracker(object):
                 refind_stracks.append(track)
 
         for it in u_track:
-            #track = r_tracked_stracks[it]
             track = r_tracked_stracks[it]
             if not track.state == TrackState.Lost:
                 track.mark_lost()
@@ -351,3 +348,16 @@ def remove_duplicate_stracks(stracksa, stracksb):
     resa = [t for i, t in enumerate(stracksa) if not i in dupa]
     resb = [t for i, t in enumerate(stracksb) if not i in dupb]
     return resa, resb
+
+
+def remove_fp_stracks(stracksa, n_frame=10):
+    remain = []
+    for t in stracksa:
+        score_5 = t.score_list[-n_frame:]
+        score_5 = np.array(score_5, dtype=np.float32)
+        index = score_5 < 0.45
+        num = np.sum(index)
+        if num < n_frame:
+            remain.append(t)
+    return remain
+

@@ -1,28 +1,18 @@
 import numpy as np
 from collections import deque
-import itertools
 import os
 import os.path as osp
-import time
+import copy
 import torch
-import cv2
 import torch.nn.functional as F
 
-from models.model import create_model, load_model
-from models.decode import mot_decode
-from tracking_utils.utils import *
-from tracking_utils.log import logger
-from tracking_utils.kalman_filter import KalmanFilter
-from models import *
-from tracker import matching
+from .kalman_filter import KalmanFilter
+from mot_online import matching
 from .basetrack import BaseTrack, TrackState
-from utils.post_process import ctdet_post_process
-from utils.image import get_affine_transform
-from models.utils import _tranpose_and_gather_feat
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
-    def __init__(self, tlwh, score):
+    def __init__(self, tlwh, score, buffer_size=30):
 
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=np.float)
@@ -70,7 +60,6 @@ class STrack(BaseTrack):
         self.mean, self.covariance = self.kalman_filter.update(
             self.mean, self.covariance, self.tlwh_to_xyah(new_track.tlwh)
         )
-
         self.tracklet_len = 0
         self.state = TrackState.Tracked
         self.is_activated = True
@@ -153,100 +142,57 @@ class STrack(BaseTrack):
         return 'OT_{}_({}-{})'.format(self.track_id, self.start_frame, self.end_frame)
 
 
-class JDETracker(object):
-    def __init__(self, opt, frame_rate=30):
-        self.opt = opt
-        if opt.gpus[0] >= 0:
-            opt.device = torch.device('cuda')
-        else:
-            opt.device = torch.device('cpu')
-        print('Creating model...')
-        self.model = create_model(opt.arch, opt.heads, opt.head_conv)
-        self.model = load_model(self.model, opt.load_model)
-        self.model = self.model.to(opt.device)
-        self.model.eval()
-
+class BYTETracker(object):
+    def __init__(self, args, frame_rate=30):
         self.tracked_stracks = []  # type: list[STrack]
         self.lost_stracks = []  # type: list[STrack]
         self.removed_stracks = []  # type: list[STrack]
 
         self.frame_id = 0
-        #self.det_thresh = opt.conf_thres
-        self.det_thresh = opt.conf_thres + 0.1
-        self.buffer_size = int(frame_rate / 30.0 * opt.track_buffer)
+        self.args = args
+        #self.det_thresh = args.track_thresh
+        self.det_thresh = args.track_thresh + 0.1
+        self.buffer_size = int(frame_rate / 30.0 * 30)
         self.max_time_lost = self.buffer_size
-        self.max_per_image = opt.K
-        self.mean = np.array(opt.mean, dtype=np.float32).reshape(1, 1, 3)
-        self.std = np.array(opt.std, dtype=np.float32).reshape(1, 1, 3)
-
+        self.max_per_image = args.num_queries
         self.kalman_filter = KalmanFilter()
 
-    def post_process(self, dets, meta):
-        dets = dets.detach().cpu().numpy()
-        dets = dets.reshape(1, -1, dets.shape[2])
-        dets = ctdet_post_process(
-            dets.copy(), [meta['c']], [meta['s']],
-            meta['out_height'], meta['out_width'], self.opt.num_classes)
-        for j in range(1, self.opt.num_classes + 1):
-            dets[0][j] = np.array(dets[0][j], dtype=np.float32).reshape(-1, 5)
-        return dets[0]
-
-    def merge_outputs(self, detections):
-        results = {}
-        for j in range(1, self.opt.num_classes + 1):
-            results[j] = np.concatenate(
-                [detection[j] for detection in detections], axis=0).astype(np.float32)
-
-        scores = np.hstack(
-            [results[j][:, 4] for j in range(1, self.opt.num_classes + 1)])
-        if len(scores) > self.max_per_image:
-            kth = len(scores) - self.max_per_image
-            thresh = np.partition(scores, kth)[kth]
-            for j in range(1, self.opt.num_classes + 1):
-                keep_inds = (results[j][:, 4] >= thresh)
-                results[j] = results[j][keep_inds]
-        return results
-
-    def update(self, im_blob, img0):
+    def update(self, output_results):
         self.frame_id += 1
         activated_starcks = []
         refind_stracks = []
         lost_stracks = []
         removed_stracks = []
 
-        width = img0.shape[1]
-        height = img0.shape[0]
-        inp_height = im_blob.shape[2]
-        inp_width = im_blob.shape[3]
-        c = np.array([width / 2., height / 2.], dtype=np.float32)
-        s = max(float(inp_width) / float(inp_height) * height, width) * 1.0
-        meta = {'c': c, 's': s,
-                'out_height': inp_height // self.opt.down_ratio,
-                'out_width': inp_width // self.opt.down_ratio}
+        scores = output_results["scores"].cpu().numpy()
+        classes = output_results["labels"].cpu().numpy()
+        bboxes = output_results["boxes"].cpu().numpy()  # x1y1x2y2
 
-        ''' Step 1: Network forward, get detections & embeddings'''
-        with torch.no_grad():
-            output = self.model(im_blob)[-1]
-            hm = output['hm'].sigmoid_()
-            wh = output['wh']
-
-            reg = output['reg'] if self.opt.reg_offset else None
-            dets, inds = mot_decode(hm, wh, reg=reg, ltrb=self.opt.ltrb, K=self.opt.K)
-
-        dets = self.post_process(dets, meta)
-        dets = self.merge_outputs([dets])[1]
-
-        remain_inds = dets[:, 4] > self.opt.conf_thres
-        inds_low = dets[:, 4] > 0.2
-        inds_high = dets[:, 4] < self.opt.conf_thres
+        remain_inds = scores > self.args.track_thresh
+        inds_low = scores > 0.2
+        inds_high = scores < self.args.track_thresh
         inds_second = np.logical_and(inds_low, inds_high)
-        dets_second = dets[inds_second]
-        dets = dets[remain_inds]
+        dets_second = bboxes[inds_second]
+        dets = bboxes[remain_inds]
+        scores_keep = scores[remain_inds]
+        scores_second = scores[inds_second]
+
+        # vis
+        '''
+        for i in range(0, dets.shape[0]):
+            bbox = dets[i][0:4]
+            cv2.rectangle(img0, (bbox[0], bbox[1]),
+                          (bbox[2], bbox[3]),
+                          (0, 255, 0), 2)
+        cv2.imshow('dets', img0)
+        cv2.waitKey(0)
+        id0 = id0-1
+        '''
 
         if len(dets) > 0:
             '''Detections'''
-            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4]) for
-                          tlbrs in dets[:, :5]]
+            detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, 30) for
+                          (tlbr, s) in zip(dets, scores_keep)]
         else:
             detections = []
 
@@ -259,12 +205,13 @@ class JDETracker(object):
             else:
                 tracked_stracks.append(track)
 
-        ''' Step 2: First association, with IOU'''
+        ''' Step 2: First association, with Kalman and IOU'''
         strack_pool = joint_stracks(tracked_stracks, self.lost_stracks)
         # Predict the current location with KF
         STrack.multi_predict(strack_pool)
         dists = matching.iou_distance(strack_pool, detections)
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=self.opt.match_thres)
+        #dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
+        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.8)
 
         for itracked, idet in matches:
             track = strack_pool[itracked]
@@ -276,11 +223,12 @@ class JDETracker(object):
                 track.re_activate(det, self.frame_id, new_id=False)
                 refind_stracks.append(track)
 
+        ''' Step 3: Second association, with IOU'''
         # association the untrack to the low score detections
         if len(dets_second) > 0:
             '''Detections'''
-            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4]) for
-                                 tlbrs in dets_second[:, :5]]
+            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbr), s, 30) for
+                          (tlbr, s) in zip(dets_second, scores_second)]
         else:
             detections_second = []
         r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
@@ -297,6 +245,7 @@ class JDETracker(object):
                 refind_stracks.append(track)
 
         for it in u_track:
+            #track = r_tracked_stracks[it]
             track = r_tracked_stracks[it]
             if not track.state == TrackState.Lost:
                 track.mark_lost()
@@ -337,17 +286,19 @@ class JDETracker(object):
         self.lost_stracks = sub_stracks(self.lost_stracks, self.removed_stracks)
         self.removed_stracks.extend(removed_stracks)
         self.tracked_stracks, self.lost_stracks = remove_duplicate_stracks(self.tracked_stracks, self.lost_stracks)
-        #self.tracked_stracks = remove_fp_stracks(self.tracked_stracks)
         # get scores of lost tracks
-        output_stracks = [track for track in self.tracked_stracks if track.is_activated]
+        #output_stracks = [track for track in self.tracked_stracks if track.is_activated]
+        ret = list()
+        for track in self.tracked_stracks:
+            if track.is_activated:
+                track_dict = {}
+                track_dict['tracking_id'] = track.track_id
+                track_dict['active'] = 1
+                track_dict['bbox'] = track.tlbr
+                track_dict['score'] = track.score
+                ret.append(track_dict)
 
-        logger.debug('===========Frame {}=========='.format(self.frame_id))
-        logger.debug('Activated: {}'.format([track.track_id for track in activated_starcks]))
-        logger.debug('Refind: {}'.format([track.track_id for track in refind_stracks]))
-        logger.debug('Lost: {}'.format([track.track_id for track in lost_stracks]))
-        logger.debug('Removed: {}'.format([track.track_id for track in removed_stracks]))
-
-        return output_stracks
+        return copy.deepcopy(ret)
 
 
 def joint_stracks(tlista, tlistb):

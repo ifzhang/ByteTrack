@@ -52,7 +52,7 @@ replace https://github.com/megvii-model/MOTR/blob/main/eval.py
 
 replace https://github.com/megvii-model/MOTR/blob/main/models/motr.py
 
-add tracker.py to https://github.com/megvii-model/MOTR
+add byte_tracker.py to https://github.com/megvii-model/MOTR
 
 add mot_online to https://github.com/megvii-model/MOTR
 

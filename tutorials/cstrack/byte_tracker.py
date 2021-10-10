@@ -148,7 +148,7 @@ class STrack(BaseTrack):
         return 'OT_{}_({}-{})'.format(self.track_id, self.start_frame, self.end_frame)
 
 
-class JDETracker(object):
+class BYTETracker(object):
     def __init__(self, opt, frame_rate=30):
         self.opt = opt
         if int(opt.gpus[0]) >= 0:
@@ -233,8 +233,6 @@ class JDETracker(object):
         ''' Step 2: First association, with embedding'''
         strack_pool = joint_stracks(tracked_stracks, self.lost_stracks)
         # Predict the current location with KF
-        #for strack in strack_pool:
-            #strack.predict()
         STrack.multi_predict(strack_pool)
         dists = matching.iou_distance(strack_pool, detections)
         matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.8)

@@ -30,7 +30,7 @@ replace https://github.com/SysCV/qdtrack/blob/master/qdtrack/models/mot/qdtrack.
 
 add mot_online to https://github.com/SysCV/qdtrack
 
-add tracker.py to https://github.com/SysCV/qdtrack
+add byte_tracker.py to https://github.com/SysCV/qdtrack
 
 
 Step3. run

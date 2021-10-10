@@ -41,13 +41,13 @@ python3 eval_motchallenge.py --groundtruths MOT17/train --tests ctracker/results
 
 
 
-# CTracker_byte
+# CTracker_BYTE
 
 #### Step3 
 
 add mot_online to https://github.com/pjl1995/CTracker
 
-add tracker.py to https://github.com/pjl1995/CTracker
+add byte_tracker.py to https://github.com/pjl1995/CTracker
 
 add test_byte.py to https://github.com/pjl1995/CTracker
 

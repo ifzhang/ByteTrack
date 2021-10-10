@@ -7,7 +7,7 @@ import motmetrics as mm
 
 import torch
 #from tracker.multitracker import JDETracker
-from tracker.motion_tracker import JDETracker
+from tracker.byte_tracker import BYTETracker
 from utils import visualization as vis
 from utils.log import logger
 from utils.timer import Timer
@@ -77,7 +77,7 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
 
     if save_dir:
         mkdir_if_missing(save_dir)
-    tracker = JDETracker(opt, frame_rate=frame_rate)
+    tracker = BYTETracker(opt, frame_rate=frame_rate)
     timer = Timer()
     results = []
     len_all = len(dataloader)

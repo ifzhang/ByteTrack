@@ -16,14 +16,14 @@ python3 test.py tracking --exp_id mot17_half --dataset mot --dataset_version 17h
 ```
 
 
-# TraDeS_kalman
+# TraDeS_BYTE
 
 Step1.  git clone https://github.com/JialianW/TraDeS.git
 
 
 Step2. 
 
-replace https://github.com/JialianW/TraDeS/blob/master/src/lib/utils/tracker.py by tracker_kalman.py
+replace https://github.com/JialianW/TraDeS/blob/master/src/lib/utils/tracker.py by byte_tracker.py
 
 replace https://github.com/JialianW/TraDeS/blob/master/src/lib/opts.py
 
@@ -36,6 +36,6 @@ python3 test.py tracking --exp_id mot17_half --dataset mot --dataset_version 17h
 
 
 ## Notes
-tracker.py: only motion
+tracker.py: motion + reid
 
-tracker_kalman.py: motion with kalman filter
+byte_tracker.py: motion with kalman filter

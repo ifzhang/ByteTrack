@@ -20,7 +20,7 @@ import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
 from datasets.panoptic_eval import PanopticEvaluator
 from datasets.data_prefetcher import data_prefetcher
-from mot_online.motion_tracker import MotionTracker
+from mot_online.byte_tracker import BYTETracker
 
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
@@ -217,7 +217,7 @@ def evaluate_track(args, model, criterion, postprocessors, data_loader, base_ds,
             assert frame_id is not None
             frame_id = frame_id.item()
             if frame_id == 1:
-                tracker = MotionTracker(args)
+                tracker = BYTETracker(args)
                 pre_embed = None
                 
         samples = samples.to(device)

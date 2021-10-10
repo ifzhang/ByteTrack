@@ -23,9 +23,9 @@ import datasets.samplers as samplers
 from datasets import build_dataset, get_coco_api_from_dataset
 from engine_track import evaluate, train_one_epoch, evaluate_track
 from models import build_tracktrain_model, build_tracktest_model, build_model
-from models import Tracker, MOTXTracker
+from models import Tracker
 from models import save_track
-from mot_online.motion_tracker import MotionTracker
+from mot_online.byte_tracker import BYTETracker
 
 from collections import defaultdict
 
@@ -294,7 +294,7 @@ def main(args):
         # test_stats, coco_evaluator, res_tracks = evaluate(model, criterion, postprocessors, data_loader_val,
         #                                                   base_ds, device, args.output_dir, tracker=tracker, 
         #                                                   phase='eval', det_val=args.det_val)
-        tracker = MotionTracker(args)
+        tracker = BYTETracker(args)
         test_stats, coco_evaluator, res_tracks = evaluate_track(args, model, criterion, postprocessors, data_loader_val,
                                                           base_ds, device, args.output_dir, tracker=tracker, 
                                                           phase='eval', det_val=args.det_val)

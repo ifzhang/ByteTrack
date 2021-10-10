@@ -134,7 +134,7 @@ class STrack(BaseTrack):
         return 'OT_{}_({}-{})'.format(self.track_id, self.start_frame, self.end_frame)
 
 
-class JDETracker(object):
+class BYTETracker(object):
     def __init__(self, opt, frame_rate=30):
         self.opt = opt
         self.model = Darknet(opt.cfg, nID=14455)

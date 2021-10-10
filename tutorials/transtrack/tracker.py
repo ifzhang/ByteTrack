@@ -8,7 +8,7 @@ from scipy.optimize import linear_sum_assignment
 from util import box_ops
 import copy
 
-class MOTXTracker(object):
+class Tracker(object):
     def __init__(self, score_thresh, max_age=32):        
         self.score_thresh = score_thresh
         self.low_thresh = 0.2

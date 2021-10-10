@@ -18,7 +18,7 @@ python3 main_track.py  --output_dir . --dataset_file mot --coco_path mot --batch
 ```
 
 
-# TransTrack_kalman
+# TransTrack_BYTE
 
 Step1.  git clone https://github.com/PeizeSun/TransTrack.git
 
@@ -41,5 +41,5 @@ python3 main_track.py  --output_dir . --dataset_file mot --coco_path mot --batch
 ## Notes
 tracker.py: only motion
 
-mot_online/motion_tracker.py: motion with kalman filter
+mot_online/byte_tracker.py: motion with kalman filter
 
