@@ -11,12 +11,9 @@ python3 tools/export_onnx.py --output-name bytetrack_s.onnx -f exps/example/mot/
 
 ### ONNXRuntime Demo
 
-Step1.
+You can run onnx demo with **16 FPS**:
+
 ```shell
 cd <ByteTrack_HOME>/deploy/ONNXRuntime
-```
-
-Step2. 
-```shell
-python3 onnx_inference.py -m <ONNX_MODEL_PATH> -i <IMAGE_PATH> -o <OUTPUT_DIR> -s 0.3 --input_shape 640,640
+python3 onnx_inference.py
 ```
