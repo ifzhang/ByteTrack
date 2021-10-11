@@ -4,6 +4,17 @@
 
 Clone [ncnn](https://github.com/Tencent/ncnn) first, then please following [build tutorial of ncnn](https://github.com/Tencent/ncnn/wiki/how-to-build) to build on your own device.
 
+Install eigen-3.3.9 [[google]](https://drive.google.com/file/d/1rqO74CYCNrmRAg8Rra0JP3yZtJ-rfket/view?usp=sharing), [[baidu(code:ueq4)]](https://pan.baidu.com/s/15kEfCxpy-T7tz60msxxExg).
+
+```shell
+unzip eigen-3.3.9.zip
+cd eigen-3.3.9
+mkdir build
+cd build
+cmake ..
+sudo make install
+```
+
 ## Generate onnx file
 Use provided tools to generate onnx file.
 For example, if you want to generate onnx file of bytetrack_s_mot17.pth, please run the following command:
