@@ -1,15 +1,14 @@
 # ByteTrack
-ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box
 
-<p align="center"><img src="assets/sota.png" width="450"/></p> 
+<p align="center"><img src="assets/sota.png" width="550"/></p> 
 
-> [**ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box**](http://arxiv.org/abs/2004.01888),            
+> [**ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box**](http://arxiv.org/abs/2004.01888)           
 > Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Zehuan Yuan, Ping Luo, Wenyu Liu, Xinggang Wang       
 > *[arXiv 2004.01888](http://arxiv.org/abs/2004.01888)*
 
 ## Abstract
 Multi-object tracking (MOT) aims at estimating bounding boxes and identities of objects in videos. Most methods obtain identities by associating detection boxes in sequence. To filter out the background, previous methods only keep the boxes whose scores are higher than a threshold. However, the objects in low scores, e.g. occluded objects, are simply thrown away and bring non-negligible missing detections and fragmented trajectories. To solve this problem, we present a simple, effective and generic detection-driven association method, called BYTE, tracking BY associaTing Every detection box instead of only the high score ones. We utilize the similarity with tracklets to recover the objects in low score detection boxes and filter out the background, simultaneously. We apply BYTE to 9 different state-of-the-art trackers and achieve consistent improvement on IDF1 score ranging from 1 to 10 points. To put forwards the state-of-the-art performance of MOT, we design a simple and strong tracker, named ByteTrack. For the first time, we achieve 80.3 MOTA, 77.3 IDF1 and 63.1 HOTA on the test set of MOT17 with 30 FPS running speed on a single V100 GPU.
-<p align="center"><img src="assets/teasing.png" width="300"/></p>
+<p align="center"><img src="assets/teasing.png" width="400"/></p>
 
 ## Tracking performance
 ### Results on MOT challenge test set
