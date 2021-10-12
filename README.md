@@ -211,8 +211,16 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pret
 3.  [TensorRT in C++](./deploy/TensorRT/cpp)
 4.  [ncnn in C++](./deploy/ncnn/cpp)
 
+## Citation
 
+```
+@article{zhang2021bytetrack,
+  title={ByteTrack: Multi-Object Tracking by Associating Every Detection Box},
+  author={Zhang, Yifu and Sun, Peize and Jiang, Yi and Yu, Dongdong and Yuan, Zehuan and Luo, Ping and Liu, Wenyu and Wang, Xinggang},
+  journal={arXiv preprint arXiv:2004.01888},
+  year={2021}
+}
 
 ## Acknowledgement
 
-A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT) and [TransTrack](https://github.com/PeizeSun/TransTrack). Many thanks for their wonderful works.
+A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT), [TransTrack](https://github.com/PeizeSun/TransTrack) and [JDE-Cpp](https://github.com/samylee/Towards-Realtime-MOT-Cpp). Many thanks for their wonderful works.
