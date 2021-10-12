@@ -220,6 +220,7 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pret
   journal={arXiv preprint arXiv:2004.01888},
   year={2021}
 }
+```
 
 ## Acknowledgement
 
