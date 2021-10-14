@@ -2,9 +2,9 @@
 ByteTrack is a simple, fast and strong multi-object tracker.
 <p align="center"><img src="assets/sota.png" width="500"/></p> 
 
-> [**ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box**](http://arxiv.org/abs/2004.01888)           
+> [**ByteTrack: Multi-Object Tracking BY AssociaTing Every Detection Box**](https://arxiv.org/abs/2110.06864)           
 > Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Zehuan Yuan, Ping Luo, Wenyu Liu, Xinggang Wang       
-> *[arXiv 2004.01888](http://arxiv.org/abs/2004.01888)*
+> *[arXiv 2110.06864](https://arxiv.org/abs/2110.06864)*
 
 ## Abstract
 Multi-object tracking (MOT) aims at estimating bounding boxes and identities of objects in videos. Most methods obtain identities by associating detection boxes whose scores are higher than a threshold. The objects with low detection scores, \eg occluded objects, are simply thrown away, which brings non-negligible true object missing and fragmented trajectories. To solve this problem, we present a simple, effective and generic association method, called BYTE, tracking BY associaTing Every detection box instead of only the high score ones. For the low score detection boxes, we utilize their similarities with tracklets to recover true objects and filter out the background detections. We apply BYTE to 9 different state-of-the-art trackers and achieve consistent improvement on IDF1 score ranging from 1 to 10 points. To put forwards the state-of-the-art performance of MOT, we design a simple and strong tracker, named ByteTrack. For the first time, we achieve 80.3 MOTA, 77.3 IDF1 and 63.1 HOTA on the test set of MOT17 with 30 FPS running speed on a single V100 GPU. 
@@ -217,7 +217,7 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pret
 @article{zhang2021bytetrack,
   title={ByteTrack: Multi-Object Tracking by Associating Every Detection Box},
   author={Zhang, Yifu and Sun, Peize and Jiang, Yi and Yu, Dongdong and Yuan, Zehuan and Luo, Ping and Liu, Wenyu and Wang, Xinggang},
-  journal={arXiv preprint arXiv:2004.01888},
+  journal={arXiv preprint arXiv:2110.06864},
   year={2021}
 }
 ```
