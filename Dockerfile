@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:1.9.0-cuda11.1-cudnn8-devel
+FROM nvcr.io/nvidia/tensorrt:21.09-py3
 
 ENV DEBIAN_FRONTEND=noninteractive
 ARG USERNAME=user
@@ -21,9 +21,10 @@ RUN apt-get update && apt-get install -y \
 
 RUN git clone https://github.com/ifzhang/ByteTrack \
     && cd ByteTrack \
+    && git checkout 8df560f2c85518f2512399cae0d493933d32f548 \
     && mkdir -p YOLOX_outputs/yolox_x_mix_det/track_vis \
-    && sed -i 's/torch>=1.7/#torch>=1.7/g' requirements.txt \
-    && sed -i 's/torchvision==0.10.0/torchvision==0.10.0+cu111/g' requirements.txt \
+    && sed -i 's/torch>=1.7/torch==1.9.1+cu111/g' requirements.txt \
+    && sed -i 's/torchvision==0.10.0/torchvision==0.10.1+cu111/g' requirements.txt \
     && sed -i "s/'cuda:6'/0/g" tools/demo_track.py \
     && pip3 install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html \
     && python3 setup.py develop \
@@ -32,6 +33,14 @@ RUN git clone https://github.com/ifzhang/ByteTrack \
     && pip3 install cython_bbox gdown \
     && ldconfig \
     && pip cache purge
+
+RUN git clone https://github.com/NVIDIA-AI-IOT/torch2trt \
+    && cd torch2trt \
+    && git checkout 0400b38123d01cc845364870bdf0a0044ea2b3b2 \
+    # https://github.com/NVIDIA-AI-IOT/torch2trt/issues/619
+    && wget https://github.com/NVIDIA-AI-IOT/torch2trt/commit/8b9fb46ddbe99c2ddf3f1ed148c97435cbeb8fd3.patch \
+    && git apply 8b9fb46ddbe99c2ddf3f1ed148c97435cbeb8fd3.patch \
+    && python3 setup.py install
 
 RUN echo "root:root" | chpasswd \
     && adduser --disabled-password --gecos "" "${USERNAME}" \
