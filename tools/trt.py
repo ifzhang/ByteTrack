@@ -61,7 +61,7 @@ def main():
     torch.save(model_trt.state_dict(), os.path.join(file_name, "model_trt.pth"))
     logger.info("Converted TensorRT model done.")
     engine_file = os.path.join(file_name, "model_trt.engine")
-    engine_file_demo = os.path.join("demo", "TensorRT", "cpp", "model_trt.engine")
+    engine_file_demo = os.path.join("deploy", "TensorRT", "cpp", "model_trt.engine")
     with open(engine_file, "wb") as f:
         f.write(model_trt.engine.serialize())
 
