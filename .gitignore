@@ -137,3 +137,5 @@ docs/api
 *.onnx
 *.engine
 events.out.tfevents*
+pretrained
+YOLOX_outputs

@@ -6,14 +6,14 @@
 
 ByteTrack is a simple, fast and strong multi-object tracker.
 
-<p align="center"><img src="assets/sota.png" width="500"/></p> 
+<p align="center"><img src="assets/sota.png" width="500"/></p>
 
-> [**ByteTrack: Multi-Object Tracking by Associating Every Detection Box**](https://arxiv.org/abs/2110.06864)           
-> Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Zehuan Yuan, Ping Luo, Wenyu Liu, Xinggang Wang       
+> [**ByteTrack: Multi-Object Tracking by Associating Every Detection Box**](https://arxiv.org/abs/2110.06864)
+> Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Zehuan Yuan, Ping Luo, Wenyu Liu, Xinggang Wang
 > *[arXiv 2110.06864](https://arxiv.org/abs/2110.06864)*
 
 ## Abstract
-Multi-object tracking (MOT) aims at estimating bounding boxes and identities of objects in videos. Most methods obtain identities by associating detection boxes whose scores are higher than a threshold. The objects with low detection scores, e.g. occluded objects, are simply thrown away, which brings non-negligible true object missing and fragmented trajectories. To solve this problem, we present a simple, effective and generic association method, tracking by associating every detection box instead of only the high score ones. For the low score detection boxes, we utilize their similarities with tracklets to recover true objects and filter out the background detections. When applied to 9 different state-of-the-art trackers, our method achieves consistent improvement on IDF1 score ranging from 1 to 10 points.To put forwards the state-of-the-art performance of MOT, we design a simple and strong tracker, named ByteTrack. For the first time, we achieve 80.3 MOTA, 77.3 IDF1 and 63.1 HOTA on the test set of MOT17 with 30 FPS running speed on a single V100 GPU.  
+Multi-object tracking (MOT) aims at estimating bounding boxes and identities of objects in videos. Most methods obtain identities by associating detection boxes whose scores are higher than a threshold. The objects with low detection scores, e.g. occluded objects, are simply thrown away, which brings non-negligible true object missing and fragmented trajectories. To solve this problem, we present a simple, effective and generic association method, tracking by associating every detection box instead of only the high score ones. For the low score detection boxes, we utilize their similarities with tracklets to recover true objects and filter out the background detections. When applied to 9 different state-of-the-art trackers, our method achieves consistent improvement on IDF1 score ranging from 1 to 10 points.To put forwards the state-of-the-art performance of MOT, we design a simple and strong tracker, named ByteTrack. For the first time, we achieve 80.3 MOTA, 77.3 IDF1 and 63.1 HOTA on the test set of MOT17 with 30 FPS running speed on a single V100 GPU.
 <p align="center"><img src="assets/teasing.png" width="400"/></p>
 
 ## Tracking performance
@@ -28,7 +28,7 @@ Multi-object tracking (MOT) aims at estimating bounding boxes and identities of 
 <img src="assets/MOT20-07.gif" width="400"/>   <img src="assets/MOT20-08.gif" width="400"/>
 
 ## Installation
-
+### 1. Installing on the host machine
 Step1. Install ByteTrack.
 ```shell
 git clone https://github.com/ifzhang/ByteTrack.git
@@ -46,6 +46,26 @@ pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.gi
 Step3. Others
 ```shell
 pip3 install cython_bbox
+```
+### 2. Docker build
+```shell
+docker build -t bytetrack:latest .
+
+# Startup sample
+mkdir -p pretrained && \
+mkdir -p YOLOX_outputs && \
+xhost +local: && \
+docker run --gpus all -it --rm \
+-v $PWD/pretrained:/workspace/ByteTrack/pretrained \
+-v $PWD/datasets:/workspace/ByteTrack/datasets \
+-v $PWD/YOLOX_outputs:/workspace/ByteTrack/YOLOX_outputs \
+-v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
+--device /dev/video0:/dev/video0:mwr \
+--net=host \
+-e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
+-e DISPLAY=$DISPLAY \
+--privileged \
+bytetrack:latest
 ```
 
 ## Data preparation
@@ -127,7 +147,7 @@ Train on CrowdHuman and MOT20, evaluate on MOT20 train
 
 ## Training
 
-The COCO pretrained YOLOX model can be downloaded from their [model zoo](https://github.com/Megvii-BaseDetection/YOLOX/tree/0.1.0). After downloading the pretrained models, you can put them under <ByteTrack_HOME>/pretrained. 
+The COCO pretrained YOLOX model can be downloaded from their [model zoo](https://github.com/Megvii-BaseDetection/YOLOX/tree/0.1.0). After downloading the pretrained models, you can put them under <ByteTrack_HOME>/pretrained.
 
 * **Train ablation model (MOT17 half train and CrowdHuman)**
 
@@ -145,7 +165,7 @@ python3 tools/train.py -f exps/example/mot/yolox_x_mix_det.py -d 8 -b 48 --fp16 
 
 * **Train MOT20 test model (MOT20 train, CrowdHuman)**
 
-For MOT20, you need to clip the bounding boxes inside the image. 
+For MOT20, you need to clip the bounding boxes inside the image.
 
 Add clip operation in [line 134-135 in data_augment.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/data_augment.py#L134), [line 122-125 in mosaicdetection.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/datasets/mosaicdetection.py#L122), [line 217-225 in mosaicdetection.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/datasets/mosaicdetection.py#L217), [line 115-118 in boxes.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/utils/boxes.py#L115).
 
@@ -164,7 +184,7 @@ Run ByteTrack:
 cd <ByteTrack_HOME>
 python3 tools/track.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
 ```
-You can get 76.6 MOTA using our pretrained model. 
+You can get 76.6 MOTA using our pretrained model.
 
 Run other trackers:
 ```shell
@@ -182,7 +202,7 @@ cd <ByteTrack_HOME>
 python3 tools/track.py -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar -b 1 -d 1 --fp16 --fuse
 python3 tools/interpolation.py
 ```
-Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and you can get 79+ MOTA (For 80+ MOTA, you need to carefully tune the test image size and high score detection threshold of each sequence). 
+Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and you can get 79+ MOTA (For 80+ MOTA, you need to carefully tune the test image size and high score detection threshold of each sequence).
 
 * **Test on MOT20**
 
@@ -195,7 +215,7 @@ cd <ByteTrack_HOME>
 python3 tools/track.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -c pretrained/bytetrack_x_mot20.pth.tar -b 1 -d 1 --fp16 --fuse --match_thresh 0.7 --mot20
 python3 tools/interpolation.py
 ```
-Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and you can get 77+ MOTA (For higher MOTA, you need to carefully tune the test image size and high score detection threshold of each sequence). 
+Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and you can get 77+ MOTA (For higher MOTA, you need to carefully tune the test image size and high score detection threshold of each sequence).
 
 ## Applying BYTE to other trackers
 
