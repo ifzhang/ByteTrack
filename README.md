@@ -11,6 +11,7 @@ ByteTrack is a simple, fast and strong multi-object tracker.
 > [**ByteTrack: Multi-Object Tracking by Associating Every Detection Box**](https://arxiv.org/abs/2110.06864)
 > 
 > Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Zehuan Yuan, Ping Luo, Wenyu Liu, Xinggang Wang
+> 
 > *[arXiv 2110.06864](https://arxiv.org/abs/2110.06864)*
 
 ## Abstract
