@@ -86,9 +86,17 @@ make
 ```
 
 ## Run the demo
+You can run the ncnn demo with **5 FPS** (96-core Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz):
 ```shell
 ./bytetrack palace.mp4
 ```
+
+You can modify 'num_threads' to optimize the running speed in [bytetrack.cpp](https://github.com/ifzhang/ByteTrack/blob/2e9a67895da6b47b948015f6861bba0bacd4e72f/deploy/ncnn/cpp/src/bytetrack.cpp#L309) according to the number of your CPU cores:
+
+```
+yolox.opt.num_threads = 20;
+```
+
 
 ## Acknowledgement
 
