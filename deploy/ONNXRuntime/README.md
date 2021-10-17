@@ -11,7 +11,7 @@ python3 tools/export_onnx.py --output-name bytetrack_s.onnx -f exps/example/mot/
 
 ### ONNXRuntime Demo
 
-You can run onnx demo with **16 FPS**:
+You can run onnx demo with **16 FPS** (96-core Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz):
 
 ```shell
 cd <ByteTrack_HOME>/deploy/ONNXRuntime
