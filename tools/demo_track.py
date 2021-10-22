@@ -274,7 +274,6 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
 
 
 def main(exp, args):
-    torch.cuda.set_device('cuda')
     if not args.experiment_name:
         args.experiment_name = exp.exp_name
 
