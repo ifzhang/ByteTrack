@@ -179,6 +179,16 @@ cd <ByteTrack_HOME>
 python3 tools/train.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
 ```
 
+* **Train custom dataset**
+
+First, you need to prepare your dataset in COCO format. You can refer to [MOT-to-COCO](https://github.com/ifzhang/ByteTrack/blob/main/tools/convert_mot17_to_coco.py) or [CrowdHuman-to-COCO](https://github.com/ifzhang/ByteTrack/blob/main/tools/convert_crowdhuman_to_coco.py). Then, you need to create a Exp file for your dataset. You can refer to the [CrowdHuman](https://github.com/ifzhang/ByteTrack/blob/main/exps/example/mot/yolox_x_ch.py) training Exp file. Don't forget to modify get_data_loader() and get_eval_loader in your Exp file. Finally, you can train bytetrack on your dataset by running:
+
+```shell
+cd <ByteTrack_HOME>
+python3 tools/train.py -f exps/example/mot/your_exp_file.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
+```
+
+
 ## Tracking
 
 * **Evaluation on MOT17 half val**
@@ -225,6 +235,19 @@ Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and yo
 ## Applying BYTE to other trackers
 
 See [tutorials](https://github.com/ifzhang/ByteTrack/tree/main/tutorials).
+
+## Combining BYTE with other detectors
+
+Suppose you have already got the detection results 'dets' (x1, y1, x2, y2, score) from other detectors, you can simply pass the detection results to BYTETracker (you need to first modify some post processing code according to the format of your detection results in [byte_tracker.py](https://github.com/ifzhang/ByteTrack/blob/main/yolox/tracker/byte_tracker.py)):
+
+```
+from yolox.tracker.byte_tracker import BYTETracker
+tracker = BYTETracker(args)
+for i in range(frames):
+   online_targets = tracker.update(dets[i], info_imgs, img_size)
+```
+
+You can get the tracking results in each frame from 'online_targets'. You can refer to [mot_evaluators.py](https://github.com/ifzhang/ByteTrack/blob/main/yolox/evaluators/mot_evaluator.py) to pass the detection results to BYTETracker.
 
 ## Demo
 
