@@ -243,8 +243,9 @@ Suppose you have already got the detection results 'dets' (x1, y1, x2, y2, score
 ```
 from yolox.tracker.byte_tracker import BYTETracker
 tracker = BYTETracker(args)
-for i in range(frames):
-   online_targets = tracker.update(dets[i], info_imgs, img_size)
+for image in images:
+   dets = detector(image)
+   online_targets = tracker.update(dets, info_imgs, img_size)
 ```
 
 You can get the tracking results in each frame from 'online_targets'. You can refer to [mot_evaluators.py](https://github.com/ifzhang/ByteTrack/blob/main/yolox/evaluators/mot_evaluator.py) to pass the detection results to BYTETracker.
