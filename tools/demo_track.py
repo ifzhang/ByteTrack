@@ -187,23 +187,27 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
         if frame_id % 20 == 0:
             logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
         outputs, img_info = predictor.inference(image_name, timer)
-        online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], exp.test_size)
-        online_tlwhs = []
-        online_ids = []
-        online_scores = []
-        for t in online_targets:
-            tlwh = t.tlwh
-            tid = t.track_id
-            vertical = tlwh[2] / tlwh[3] > 1.6
-            if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
-                online_tlwhs.append(tlwh)
-                online_ids.append(tid)
-                online_scores.append(t.score)
-        timer.toc()
-        # save results
-        results.append((frame_id + 1, online_tlwhs, online_ids, online_scores))
-        online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, frame_id=frame_id + 1,
+        if outputs[0] is not None:
+            online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], exp.test_size)
+            online_tlwhs = []
+            online_ids = []
+            online_scores = []
+            for t in online_targets:
+                tlwh = t.tlwh
+                tid = t.track_id
+                vertical = tlwh[2] / tlwh[3] > 1.6
+                if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
+                    online_tlwhs.append(tlwh)
+                    online_ids.append(tid)
+                    online_scores.append(t.score)
+            # save results
+            results.append((frame_id + 1, online_tlwhs, online_ids, online_scores))
+            timer.toc()
+            online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, frame_id=frame_id + 1,
                                           fps=1. / timer.average_time)
+        else:
+            timer.toc()
+            online_im = img_info['raw_img']
 
         #result_image = predictor.visual(outputs[0], img_info, predictor.confthre)
         if save_result:
@@ -247,22 +251,26 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         ret_val, frame = cap.read()
         if ret_val:
             outputs, img_info = predictor.inference(frame, timer)
-            online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], exp.test_size)
-            online_tlwhs = []
-            online_ids = []
-            online_scores = []
-            for t in online_targets:
-                tlwh = t.tlwh
-                tid = t.track_id
-                vertical = tlwh[2] / tlwh[3] > 1.6
-                if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
-                    online_tlwhs.append(tlwh)
-                    online_ids.append(tid)
-                    online_scores.append(t.score)
-            timer.toc()
-            results.append((frame_id + 1, online_tlwhs, online_ids, online_scores))
-            online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, frame_id=frame_id + 1,
-                                      fps=1. / timer.average_time)
+            if outputs[0] is not None:
+                online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], exp.test_size)
+                online_tlwhs = []
+                online_ids = []
+                online_scores = []
+                for t in online_targets:
+                    tlwh = t.tlwh
+                    tid = t.track_id
+                    vertical = tlwh[2] / tlwh[3] > 1.6
+                    if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
+                        online_tlwhs.append(tlwh)
+                        online_ids.append(tid)
+                        online_scores.append(t.score)
+                results.append((frame_id + 1, online_tlwhs, online_ids, online_scores))
+                timer.toc()
+                online_im = plot_tracking(img_info['raw_img'], online_tlwhs, online_ids, frame_id=frame_id + 1,
+                                          fps=1. / timer.average_time)
+            else:
+                timer.toc()
+                online_im = img_info['raw_img']
             if args.save_result:
                 vid_writer.write(online_im)
             ch = cv2.waitKey(1)
