@@ -234,7 +234,7 @@ class OnlineTracker(object):
             det_scores = np.ones(len(tlwhs), dtype=float)
         detections = [STrack(tlwh, score, from_det=True) for tlwh, score in zip(tlwhs, det_scores)]
         if self.use_tracking:
-            tracks = [STrack(t.self_tracking(image), t.score * t.tracklet_score(), from_det=False)
+            tracks = [STrack(t.self_tracking(image), 0.6 * t.tracklet_score(), from_det=False)
                         for t in itertools.chain(self.tracked_stracks, self.lost_stracks) if t.is_activated]
             detections.extend(tracks)
         rois = np.asarray([d.tlbr for d in detections], dtype=np.float32)
