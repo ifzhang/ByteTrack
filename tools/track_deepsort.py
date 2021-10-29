@@ -102,7 +102,7 @@ def make_parser():
     parser.add_argument("--tsize", default=None, type=int, help="test img size")
     parser.add_argument("--seed", default=None, type=int, help="eval seed")
     # tracking args
-    parser.add_argument("--track_thresh", type=float, default=0.6, help="tracking confidence threshold")
+    parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=int, default=0.9, help="matching threshold for tracking")
     parser.add_argument('--min-box-area', type=float, default=100, help='filter out tiny boxes')
