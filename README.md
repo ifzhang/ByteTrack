@@ -125,7 +125,7 @@ python3 tools/mix_data_test_mot20.py
 
 ## Model zoo
 
-### Ablatioin model
+### Ablation model
 
 Train on CrowdHuman and MOT17 half train, evaluate on MOT17 half val
 
