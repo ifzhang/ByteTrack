@@ -104,7 +104,7 @@ def make_parser():
     # tracking args
     parser.add_argument("--track_thresh", type=float, default=0.6, help="tracking confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
-    parser.add_argument("--match_thresh", type=int, default=0.9, help="matching threshold for tracking")
+    parser.add_argument("--match_thresh", type=float, default=0.9, help="matching threshold for tracking")
     parser.add_argument('--min-box-area', type=float, default=100, help='filter out tiny boxes')
     # deepsort args
     parser.add_argument("--model_folder", type=str, default='pretrained/googlenet_part8_all_xavier_ckpt_56.h5', help="reid model folder")
