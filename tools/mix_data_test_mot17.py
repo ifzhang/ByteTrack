@@ -16,7 +16,7 @@ ln -s ../ETHZ ethz_train
 cd ..
 """
 
-mot_json = json.load(open('datasets/mot/annotations/train_half.json','r'))
+mot_json = json.load(open('datasets/mot/annotations/train.json','r'))
 
 img_list = list()
 for img in mot_json['images']:
