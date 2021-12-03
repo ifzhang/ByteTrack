@@ -1,6 +1,6 @@
 # CSTrack
 
-Step1.  git clone https://github.com/JudasDie/SOTS.git
+Step1.  git clone -b MOT https://github.com/JudasDie/SOTS.git
 
 
 Step2. replace https://github.com/JudasDie/SOTS/blob/master/lib/tracker/cstrack.py
@@ -11,7 +11,7 @@ Step3. download cstrack model trained on MIX and MOT17_half (mix_mot17_half_cstr
 
 Step4. run BYTE tracker example:
 ```
-python3 test_cstrack.py --val_mot17 True --val_hf 2 --weights weights/mix_mot17_half_cstrack.pt --conf_thres 0.7 --data_cfg ../src/lib/cfg/mot17_hf.json --data_dir your/data/path
+python3 test_cstrack.py --val_mot17 True --val_hf 2 --weights weights/mix_mot17_half_cstrack.pt --conf_thres 0.6 --data_cfg ../src/lib/cfg/mot17_hf.json --data_dir your/data/path
 ```
 
 
