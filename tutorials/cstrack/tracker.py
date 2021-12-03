@@ -201,7 +201,7 @@ class JDETracker(object):
         self.std = np.array(opt.std, dtype=np.float32).reshape(1, 1, 3)
 
         self.kalman_filter = KalmanFilter()
-        self.low_thres = 0.2
+        self.low_thres = 0.1
         self.high_thres = self.opt.conf_thres + 0.1
 
     def update(self, im_blob, img0,seq_num, save_dir):
@@ -221,6 +221,7 @@ class JDETracker(object):
         detections = []
         if len(pred) > 0:
             dets,x_inds,y_inds = non_max_suppression_and_inds(pred[:,:6].unsqueeze(0), 0.1, self.opt.nms_thres,method='cluster_diou')
+            dets = dets.numpy()
             if len(dets) != 0:
                 scale_coords(self.opt.img_size, dets[:, :4], img0.shape).round()
                 id_feature = output[0][0, y_inds, x_inds, :].cpu().numpy()
@@ -244,6 +245,10 @@ class JDETracker(object):
                 detections = []
                 dets_second = []
                 id_feature_second = []
+        else:
+            detections = []
+            dets_second = []
+            id_feature_second = []
 
         ''' Add newly detected tracklets to tracked_stracks'''
         unconfirmed = []
