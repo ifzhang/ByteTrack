@@ -1,10 +1,13 @@
+import time
+
 import cv2
 from Model_Classes.YoloV5_6 import YoloV5_6
 from Model_Classes.byte_tracker import ByteTracker
 from Model_Classes.deep_sort import DeepSort
 
 video_path = "test_samples/stream6_Trim.mp4"
-
+deep_sort_times = []
+byte_track_times = []
 
 class YoloV6DefaultArgs():
     def __init__(self):
@@ -94,14 +97,25 @@ if __name__ == "__main__":
         ret, frame = cap.read()
         if ret == True:
             object_detection_results = person_detector.infer(frame)
-            object_tracking_results  = deep_person_tracker.infer(ori_img=frame, detections=object_detection_results.Detections)
+            
+            s = time.time()
+            deep_sort_object_tracking_results  = deep_person_tracker.infer(ori_img=frame, detections=object_detection_results.Detections)
+            e = time.time()
+            deep_sort_times.append(e-s)
 
-            detected_frame = show_tracking_results(frame, object_tracking_results) 
-            out.write(detected_frame)
+            s = time.time()
+            byte_track_object_tracking_results  = byte_person_tracker.infer(ori_img=frame, detections=object_detection_results.Detections)
+            e = time.time()
+            byte_track_times.append(e-s)
+            # detected_frame = show_tracking_results(frame, object_tracking_results) 
+            # out.write(detected_frame)
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 break
         else:
             break
+    
+    print(f"Deep sort avg times: {sum(deep_sort_times)/len(deep_sort_times):.5f} seconds")
+    print(f"Byte track avg times: {sum(byte_track_times)/len(byte_track_times):.5f} seconds")
     
     cap.release()
     cv2.destroyAllWindows()
