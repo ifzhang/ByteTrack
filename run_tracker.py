@@ -113,6 +113,7 @@ if __name__ == "__main__":
                 break
         else:
             break
+            pass
     
     print(f"Deep sort avg times: {sum(deep_sort_times)/len(deep_sort_times):.5f} seconds")
     print(f"Byte track avg times: {sum(byte_track_times)/len(byte_track_times):.5f} seconds")
