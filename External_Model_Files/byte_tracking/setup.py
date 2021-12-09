@@ -32,8 +32,7 @@ def get_extensions():
             "yolox._C",
             sources,
             include_dirs=include_dirs,
-            define_macros=define_macros,
-            extra_compile_args=extra_compile_args,
+            define_macros=define_macros
         )
     ]
 
