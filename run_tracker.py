@@ -5,7 +5,7 @@ from Model_Classes.YoloV5_6 import YoloV5_6
 from Model_Classes.byte_tracker import ByteTracker
 from Model_Classes.deep_sort import DeepSort
 
-video_path = "test_samples/stream6_Trim.mp4"
+video_path = "intersection_sample.mp4"
 deep_sort_times = []
 byte_track_times = []
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
 
-    out = cv2.VideoWriter('output_test_deep_sort.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
+    out = cv2.VideoWriter('output_test_intersect_byte.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
 
     yolo_args = YoloV6DefaultArgs()
     person_detector = YoloV5_6(yolo_args)
@@ -89,33 +89,33 @@ if __name__ == "__main__":
     byte_args = ByteTrackerDefaultArgs()
     byte_person_tracker = ByteTracker(byte_args)
 
-    deep_sort_default_aruments = DeepsortDefaultArgs()
-    deep_person_tracker = DeepSort(deep_sort_default_aruments)
-    deep_person_tracker.set_model() 
+    # deep_sort_default_aruments = DeepsortDefaultArgs()
+    # deep_person_tracker = DeepSort(deep_sort_default_aruments)
+    # deep_person_tracker.set_model() 
 
     while(cap.isOpened()):
         ret, frame = cap.read()
         if ret == True:
             object_detection_results = person_detector.infer(frame)
             
-            s = time.time()
-            deep_sort_object_tracking_results  = deep_person_tracker.infer(ori_img=frame, detections=object_detection_results.Detections)
-            e = time.time()
-            deep_sort_times.append(e-s)
+            # s = time.time()
+            # deep_sort_object_tracking_results  = deep_person_tracker.infer(ori_img=frame, detections=object_detection_results.Detections)
+            # e = time.time()
+            # deep_sort_times.append(e-s)
 
             s = time.time()
             byte_track_object_tracking_results  = byte_person_tracker.infer(ori_img=frame, detections=object_detection_results.Detections)
             e = time.time()
             byte_track_times.append(e-s)
-            # detected_frame = show_tracking_results(frame, object_tracking_results) 
-            # out.write(detected_frame)
+            detected_frame = show_tracking_results(frame, byte_track_object_tracking_results) 
+            out.write(detected_frame)
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 break
         else:
             break
             pass
     
-    print(f"Deep sort avg times: {sum(deep_sort_times)/len(deep_sort_times):.5f} seconds")
+    # print(f"Deep sort avg times: {sum(deep_sort_times)/len(deep_sort_times):.5f} seconds")
     print(f"Byte track avg times: {sum(byte_track_times)/len(byte_track_times):.5f} seconds")
     
     cap.release()
