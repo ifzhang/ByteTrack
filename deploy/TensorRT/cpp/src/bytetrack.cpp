@@ -435,13 +435,13 @@ int main(int argc, char** argv) {
 	if (!cap.isOpened())
 		return 0;
 
-	int img_w = cap.get(CV_CAP_PROP_FRAME_WIDTH);
-	int img_h = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-    int fps = cap.get(CV_CAP_PROP_FPS);
-    long nFrame = static_cast<long>(cap.get(CV_CAP_PROP_FRAME_COUNT));
+	int img_w = cap.get(CAP_PROP_FRAME_WIDTH);
+	int img_h = cap.get(CAP_PROP_FRAME_HEIGHT);
+    int fps = cap.get(CAP_PROP_FPS);
+    long nFrame = static_cast<long>(cap.get(CAP_PROP_FRAME_COUNT));
     cout << "Total frames: " << nFrame << endl;
 
-    VideoWriter writer("demo.mp4", CV_FOURCC('m', 'p', '4', 'v'), fps, Size(img_w, img_h));
+    VideoWriter writer("demo.mp4", VideoWriter::fourcc('m', 'p', '4', 'v'), fps, Size(img_w, img_h));
 
     Mat img;
     BYTETracker tracker(fps, 30);
