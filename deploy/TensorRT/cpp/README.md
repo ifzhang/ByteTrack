@@ -35,7 +35,7 @@ static const int INPUT_H = 608;
 You can first build the demo:
 
 ```shell
-cd <ByteTrack_HOME>/demo/TensorRT/cpp
+cd <ByteTrack_HOME>/deploy/TensorRT/cpp
 mkdir build
 cd build
 cmake ..
