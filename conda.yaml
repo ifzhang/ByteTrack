@@ -1,20 +1,12 @@
-name: yol
+name: byte
 
 channels:
-  - defaults
+  - conda-forge
 dependencies:
+  - pip
+  - cython
+  - 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+  - cython_bbox
   - pip:
-    
-    - matplotlib>=3.2.2
-    - numpy>=1.18.5
-    - mlflow==1.2.0
-    - opencv-python>=4.1.2
-    - Pillow>=7.1.2
-    - PyYAML>=5.3.1
-    - requests>=2.23.0
-    - scipy>=1.4.1
-    - torch==1.7.0+cpu 
-    - torchvision>=0.8.1+cpu
-    - tqdm>=4.41.0
-    - pandas>=1.1.4
-    - seaborn>=0.11.0
+    - -r requirements.txt
+  
