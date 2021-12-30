@@ -4,8 +4,6 @@ channels:
   - conda-forge
 dependencies:
   - pip
-  - cython
-  - 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
   
   - pip:
     - -r requirements.txt
