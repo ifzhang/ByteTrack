@@ -1,11 +1,7 @@
 # TODO: Update with exact module version
 numpy
-torch==1.7.1
 opencv_python
 loguru
-scikit-image
-tqdm
-torchvision==0.10.0
 Pillow
 thop
 ninja
@@ -15,6 +11,11 @@ lap
 motmetrics
 filterpy
 h5py
+scikit-image
+torch==1.9.0
+tqdm
+torchvision==0.10.0
+
 
 # verified versions
 onnx==1.8.1
