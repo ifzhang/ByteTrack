@@ -51,7 +51,7 @@ logger.info('Default LAP solver \'{}\''.format(mm.lap.default_solver))
 logger.info('Loading files.')
 
 gt = OrderedDict([(Path(f).parts[-3], mm.io.loadtxt(f, fmt='mot15-2D', min_confidence=1)) for f in gtfiles])
-ts = OrderedDict([(os.path.splitext(Path(f).parts[-1])[0], mm.io.loadtxt(f, fmt='mot15-2D', min_confidence=0.6)) for f in tsfiles])    
+ts = OrderedDict([(os.path.splitext(Path(f).parts[-1])[0], mm.io.loadtxt(f, fmt='mot15-2D', min_confidence=-1.0)) for f in tsfiles])    
 
 mh = mm.metrics.create()    
 accs, names = compare_dataframes(gt, ts)
