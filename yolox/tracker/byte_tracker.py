@@ -213,7 +213,7 @@ class BYTETracker(object):
             track = strack_pool[itracked]
             det = detections[idet]
             if track.state == TrackState.Tracked:
-                track.update(detections[idet], self.frame_id)
+                track.update(det, self.frame_id)
                 activated_starcks.append(track)
             else:
                 track.re_activate(det, self.frame_id, new_id=False)
