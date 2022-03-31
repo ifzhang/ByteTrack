@@ -151,10 +151,7 @@ class MOTEvaluator:
                     self.args.track_thresh = 0.7
                 elif video_name == 'MOT17-14-FRCNN':
                     self.args.track_thresh = 0.67
-                else:
-                    self.args.track_thresh = ori_thresh
-                
-                if video_name == 'MOT20-06' or video_name == 'MOT20-08':
+                elif video_name in ['MOT20-06', 'MOT20-08']:
                     self.args.track_thresh = 0.3
                 else:
                     self.args.track_thresh = ori_thresh
