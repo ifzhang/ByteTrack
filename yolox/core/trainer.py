@@ -91,6 +91,8 @@ class Trainer:
         iter_start_time = time.time()
 
         inps, targets = self.prefetcher.next()
+        track_ids = targets[:, :, 5]
+        targets = targets[:, :, :5]
         inps = inps.to(self.data_type)
         targets = targets.to(self.data_type)
         targets.requires_grad = False
