@@ -20,7 +20,7 @@ NvMOTStatus NvMOT_Query(uint16_t customConfigFilePathSize,
     pQuery->memType = NVBUF_MEM_CUDA_DEVICE;
 #endif
 
-    pQuery->supportBatchProcessing = false;    // set NvMOTBatchMode_Batch if the low-level tracker supports batch processing mode. Otherwise, NvMOTBatchMode_NonBatch
+    pQuery->batchMode              = NvMOTBatchMode_NonBatch;    // set NvMOTBatchMode_Batch if the low-level tracker supports batch processing mode. Otherwise, NvMOTBatchMode_NonBatch
     pQuery->supportPastFrame       = false;    // set true if the low-level tracker supports the past-frame data or not
 
     /**
@@ -68,6 +68,6 @@ NvMOTStatus NvMOT_Process(NvMOTContextHandle contextHandle,
     return NvMOTStatus_OK;
 }
 
-void NvMOT_RemoveStreams(NvMOTContextHandle contextHandle, NvMOTStreamId streamIdMask) {
-
+NvMOTStatus NvMOT_RemoveStreams(NvMOTContextHandle contextHandle, NvMOTStreamId streamIdMask) {
+    return contextHandle -> removeStream(streamIdMask);
 }
