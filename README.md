@@ -280,6 +280,7 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pret
 2.  [TensorRT in Python](./deploy/TensorRT/python)
 3.  [TensorRT in C++](./deploy/TensorRT/cpp)
 4.  [ncnn in C++](./deploy/ncnn/cpp)
+5.  [Deepstream](./deploy/DeepStream)
 
 ## Citation
 
