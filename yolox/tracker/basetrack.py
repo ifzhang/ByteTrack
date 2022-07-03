@@ -10,8 +10,9 @@ class TrackState(object):
 
 
 class BaseTrack(object):
-    def __init__(self):
+    def __init__(self, count_gen=None):
         self._count = 0
+        self.count_gen = count_gen
 
         self.track_id = 0
         self.is_activated = False
@@ -33,7 +34,10 @@ class BaseTrack(object):
         return self.frame_id
 
     def next_id(self):
-        self._count += 1
+        if self.count_gen:
+            self._count = self.count_gen.__next__()
+        else:
+            self._count += 1
         return self._count
 
     def activate(self, *args):
