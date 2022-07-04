@@ -7,7 +7,7 @@ import torch
 import torch.nn.functional as F
 
 from .kalman_filter import KalmanFilter
-from yolox.tracker import matching
+from . import matching
 from .basetrack import BaseTrack, TrackState
 
 class STrack(BaseTrack):
