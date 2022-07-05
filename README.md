@@ -285,11 +285,11 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pret
 ## Citation
 
 ```
-@article{zhang2021bytetrack,
+@article{zhang2022bytetrack,
   title={ByteTrack: Multi-Object Tracking by Associating Every Detection Box},
-  author={Zhang, Yifu and Sun, Peize and Jiang, Yi and Yu, Dongdong and Yuan, Zehuan and Luo, Ping and Liu, Wenyu and Wang, Xinggang},
-  journal={arXiv preprint arXiv:2110.06864},
-  year={2021}
+  author={Zhang, Yifu and Sun, Peize and Jiang, Yi and Yu, Dongdong and Weng, Fucheng and Yuan, Zehuan and Luo, Ping and Liu, Wenyu and Wang, Xinggang},
+  booktitle={Proceedings of the European Conference on Computer Vision (ECCV)},
+  year={2022}
 }
 ```
 
