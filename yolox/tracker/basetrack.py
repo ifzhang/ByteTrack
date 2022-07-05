@@ -10,31 +10,31 @@ class TrackState(object):
 
 
 class BaseTrack(object):
-    def __init__(self):
-        self._count = 0
+    _count = 0
 
-        self.track_id = 0
-        self.is_activated = False
-        self.state = TrackState.New
+    track_id = 0
+    is_activated = False
+    state = TrackState.New
 
-        self.history = OrderedDict()
-        self.features = []
-        self.curr_feature = None
-        self.score = 0
-        self.start_frame = 0
-        self.frame_id = 0
-        self.time_since_update = 0
+    history = OrderedDict()
+    features = []
+    curr_feature = None
+    score = 0
+    start_frame = 0
+    frame_id = 0
+    time_since_update = 0
 
-        # multi-camera
-        self.location = (np.inf, np.inf)
+    # multi-camera
+    location = (np.inf, np.inf)
 
     @property
     def end_frame(self):
         return self.frame_id
 
-    def next_id(self):
-        self._count += 1
-        return self._count
+    @staticmethod
+    def next_id():
+        BaseTrack._count += 1
+        return BaseTrack._count
 
     def activate(self, *args):
         raise NotImplementedError
