@@ -10,9 +10,9 @@ class TrackState(object):
 
 
 class BaseTrack(object):
-    def __init__(self):
-        self._count = 0
+    _count = 0
 
+    def __init__(self):
         self.track_id = 0
         self.is_activated = False
         self.state = TrackState.New
@@ -32,9 +32,10 @@ class BaseTrack(object):
     def end_frame(self):
         return self.frame_id
 
-    def next_id(self):
-        self._count += 1
-        return self._count
+    @staticmethod
+    def next_id():
+        BaseTrack._count += 1
+        return BaseTrack._count
 
     def activate(self, *args):
         raise NotImplementedError
