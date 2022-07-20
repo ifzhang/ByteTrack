@@ -13,7 +13,7 @@ from .basetrack import BaseTrack, TrackState
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
     def __init__(self, tlwh, score):
-
+        super().__init__()  # BaseTrack init
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=np.float)
         self.kalman_filter = None
