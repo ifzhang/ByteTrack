@@ -1,4 +1,4 @@
-# ByteTrack
+# YOLOv5 Implementation of ByteTrack
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/bytetrack-multi-object-tracking-by-1/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=bytetrack-multi-object-tracking-by-1)
 
@@ -105,7 +105,7 @@ datasets
 Then, you need to turn the datasets to COCO format and mix different training data:
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/convert_mot17_to_coco.py
 python3 tools/convert_mot20_to_coco.py
 python3 tools/convert_crowdhuman_to_coco.py
@@ -116,7 +116,7 @@ python3 tools/convert_ethz_to_coco.py
 Before mixing different datasets, you need to follow the operations in [mix_xxx.py](https://github.com/ifzhang/ByteTrack/blob/c116dfc746f9ebe07d419caa8acba9b3acfa79a6/tools/mix_data_ablation.py#L6) to create a data folder and link. Finally, you can mix the training data:
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/mix_data_ablation.py
 python3 tools/mix_data_test_mot17.py
 python3 tools/mix_data_test_mot20.py
@@ -172,14 +172,14 @@ The COCO pretrained YOLOX model can be downloaded from their [model zoo](https:/
 * **Train ablation model (MOT17 half train and CrowdHuman)**
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/train.py -f exps/example/mot/yolox_x_ablation.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
 ```
 
 * **Train MOT17 test model (MOT17 train, CrowdHuman, Cityperson and ETHZ)**
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/train.py -f exps/example/mot/yolox_x_mix_det.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
 ```
 
@@ -190,7 +190,7 @@ For MOT20, you need to clip the bounding boxes inside the image.
 Add clip operation in [line 134-135 in data_augment.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/data_augment.py#L134), [line 122-125 in mosaicdetection.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/datasets/mosaicdetection.py#L122), [line 217-225 in mosaicdetection.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/datasets/mosaicdetection.py#L217), [line 115-118 in boxes.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/utils/boxes.py#L115).
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/train.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
 ```
 
@@ -199,7 +199,7 @@ python3 tools/train.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -d 8 -b 48 --
 First, you need to prepare your dataset in COCO format. You can refer to [MOT-to-COCO](https://github.com/ifzhang/ByteTrack/blob/main/tools/convert_mot17_to_coco.py) or [CrowdHuman-to-COCO](https://github.com/ifzhang/ByteTrack/blob/main/tools/convert_crowdhuman_to_coco.py). Then, you need to create a Exp file for your dataset. You can refer to the [CrowdHuman](https://github.com/ifzhang/ByteTrack/blob/main/exps/example/mot/yolox_x_ch.py) training Exp file. Don't forget to modify get_data_loader() and get_eval_loader in your Exp file. Finally, you can train bytetrack on your dataset by running:
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/train.py -f exps/example/mot/your_exp_file.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
 ```
 
@@ -211,7 +211,7 @@ python3 tools/train.py -f exps/example/mot/your_exp_file.py -d 8 -b 48 --fp16 -o
 Run ByteTrack:
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/track.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
 ```
 You can get 76.6 MOTA using our pretrained model.
@@ -228,7 +228,7 @@ python3 tools/track_motdt.py -f exps/example/mot/yolox_x_ablation.py -c pretrain
 Run ByteTrack:
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/track.py -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar -b 1 -d 1 --fp16 --fuse
 python3 tools/interpolation.py
 ```
@@ -241,7 +241,7 @@ We use the input size 1600 x 896 for MOT20-04, MOT20-07 and 1920 x 736 for MOT20
 Run ByteTrack:
 
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/track.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -c pretrained/bytetrack_x_mot20.pth.tar -b 1 -d 1 --fp16 --fuse --match_thresh 0.7 --mot20
 python3 tools/interpolation.py
 ```
@@ -269,10 +269,22 @@ You can get the tracking results in each frame from 'online_targets'. You can re
 
 <img src="assets/palace_demo.gif" width="600"/>
 
+In order to test ByteTrack with YOLOx:
+
 ```shell
-cd <ByteTrack_HOME>
+cd ByteTrack_YOLOv5_v6.0
 python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --fp16 --fuse --save_result
 ```
+In order to test ByteTrack with YOLOv5 version 6.0:
+
+```shell
+cd ByteTrack_YOLOv5_v6.0
+python3 tools_yolov5/demo_track_yolov5_v6.py webcam -f exps/example/mot/yolov5_mix_det.py --save_result --ckpt pretrained/yolov5n6.pt
+```
+User can pass ```video``` or ```image``` instead of ```webcam``` and pass the path in ```demo_track_yolov5_v6.py```.
+
+YOLOv5 Version 6 pretrained models can be downloaded from [YOLOv5 Model Zoo](https://github.com/ultralytics/yolov5/releases) under the ```Assets``` subsection of ```Version 6.1``` and ```Version 6.0```.
+
 
 ## Deploy
 
@@ -295,4 +307,5 @@ python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pret
 
 ## Acknowledgement
 
-A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT), [TransTrack](https://github.com/PeizeSun/TransTrack) and [JDE-Cpp](https://github.com/samylee/Towards-Realtime-MOT-Cpp). Many thanks for their wonderful works.
+1. A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT)[TransTrack](https://github.com/PeizeSun/TransTrack) and [JDE-Cpp](https://github.com/samylee/Towards-Realtime-MOT-Cpp). Many thanks for their wonderful works.
+2. Many thanks to [@ifzhang](https://github.com/ifzhang/ByteTrack) and [@gmt710](https://github.com/gmt710/yolov5ByteTrack) for their contributions to ByteTrack.
