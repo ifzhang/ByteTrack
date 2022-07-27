@@ -165,6 +165,8 @@ Train on CrowdHuman and MOT20, evaluate on MOT20 train.
 |bytetrack_x_mot20 [[google]](https://drive.google.com/file/d/1HX2_JpMOjOIj1Z9rJjoet9XNy_cCAs5U/view?usp=sharing), [[baidu(code:3apd)]](https://pan.baidu.com/s/1bowJJj0bAnbhEQ3_6_Am0A) | 93.4 | 89.3 | 1057 | 17.5 |
 
 
+NOTE: ```Training``` and ```Tracking``` is not required for ```Demo```. User can directly jump to ```Demo``` section to test results on YOLOx or YOLOv5 detectors.
+
 ## Training
 
 The COCO pretrained YOLOX model can be downloaded from their [model zoo](https://github.com/Megvii-BaseDetection/YOLOX/tree/0.1.0). After downloading the pretrained models, you can put them under <ByteTrack_HOME>/pretrained.
