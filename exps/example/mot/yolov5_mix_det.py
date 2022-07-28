@@ -16,7 +16,7 @@ class Exp(MyExp):
         self.width = 0.50
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         self.train_ann = "train.json"
-        self.val_ann = "train.json" #convert to train.json for training
+        self.val_ann = "test.json" #convert to train.json for training
         self.input_size = (640, 640) #inpute size changed as compared to original code.
         self.test_size = (640, 640)
         self.random_size = (12, 26)

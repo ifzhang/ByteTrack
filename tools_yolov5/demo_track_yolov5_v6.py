@@ -90,7 +90,7 @@ def make_parser():
     return parser
 
 
-def init_det(weights):
+def load_model(weights):
     # Load model
     model = attempt_load(weights)  # load FP32 model
     # model = torch.load(weights, map_location=device)[
@@ -325,7 +325,7 @@ def main(exp, args):
     if args.tsize is not None:
         exp.test_size = (args.tsize, args.tsize)
 
-    model = init_det(args.ckpt)
+    model = load_model(args.ckpt)
 
     # model = exp.get_model()
     logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
