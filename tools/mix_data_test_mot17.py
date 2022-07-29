@@ -148,4 +148,5 @@ mix_json['images'] = img_list
 mix_json['annotations'] = ann_list
 mix_json['videos'] = video_list
 mix_json['categories'] = category_list
+os.makedirs('datasets/mix_det/annotations', exist_ok=True)
 json.dump(mix_json, open('datasets/mix_det/annotations/train.json','w'))
