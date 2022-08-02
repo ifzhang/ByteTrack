@@ -43,7 +43,7 @@ Step1. Install ByteTrack.
 git clone https://github.com/ifzhang/ByteTrack.git
 cd ByteTrack
 pip3 install -r requirements.txt
-python3 setup.py develop
+pip3 install -e .
 ```
 
 Step2. Install [pycocotools](https://github.com/cocodataset/cocoapi).
