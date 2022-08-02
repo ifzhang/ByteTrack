@@ -93,8 +93,6 @@ def make_parser():
 def load_model(weights):
     # Load model
     model = attempt_load(weights)  # load FP32 model
-    # model = torch.load(weights, map_location=device)[
-    #     'model'].float()  # load to FP32
     model.to(device).eval()
     return model
 
