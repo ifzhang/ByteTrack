@@ -21,7 +21,6 @@ from yolov5.utils.general import check_img_size, non_max_suppression
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
 device = "cpu"
 
-
 def make_parser():
     parser = argparse.ArgumentParser("ByteTrack Demo!")
     parser.add_argument(
@@ -139,6 +138,7 @@ class Predictor(object):
         self.test_size = exp.test_size
         self.device = device
         self.fp16 = fp16
+
         # if trt_file is not None:
         #     from torch2trt import TRTModule
 
@@ -233,7 +233,7 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
             cv2.imwrite(save_file_name, online_im)
         ch = cv2.waitKey(0)
         frame_id += 1
-        if ch == 27 or ch == ord("q") or ch == ord("Q"):
+        if ch == 27 or ch == ord("q") or ch == ord("Q"): 
             break
     #write_results(result_filename, results)
 

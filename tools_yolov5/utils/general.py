@@ -1007,26 +1007,26 @@ def increment_path(path, exist_ok=False, sep='', mkdir=False):
 
 
 # OpenCV Chinese-friendly functions ------------------------------------------------------------------------------------
-imshow_ = cv2.imshow  # copy to avoid recursion errors
+# imshow_ = cv2.imshow  # copy to avoid recursion errors
 
 
-def imread(path, flags=cv2.IMREAD_COLOR):
-    return cv2.imdecode(np.fromfile(path, np.uint8), flags)
+# def imread(path, flags=cv2.IMREAD_COLOR):
+#     return cv2.imdecode(np.fromfile(path, np.uint8), flags)
 
 
-def imwrite(path, im):
-    try:
-        cv2.imencode(Path(path).suffix, im)[1].tofile(path)
-        return True
-    except Exception:
-        return False
+# def imwrite(path, im):
+#     try:
+#         cv2.imencode(Path(path).suffix, im)[1].tofile(path)
+#         return True
+#     except Exception:
+#         return False
 
 
-def imshow(path, im):
-    imshow_(path.encode('unicode_escape').decode(), im)
+# def imshow(path, im):
+#     imshow_(path.encode('unicode_escape').decode(), im)
 
 
-cv2.imread, cv2.imwrite, cv2.imshow = imread, imwrite, imshow  # redefine
+# cv2.imread, cv2.imwrite, cv2.imshow = imread, imwrite, imshow  # redefine
 
 # Variables ------------------------------------------------------------------------------------------------------------
 NCOLS = 0 if is_docker() else shutil.get_terminal_size().columns  # terminal window size for tqdm

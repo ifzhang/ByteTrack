@@ -201,7 +201,6 @@ class Exp(BaseExp):
 
     def get_eval_loader(self, batch_size, is_distributed, testdev=False):
         from yolox.data import COCODataset, ValTransform
-
         valdataset = COCODataset(
             data_dir=None,
             json_file=self.val_ann if not testdev else "image_info_test-dev2017.json",

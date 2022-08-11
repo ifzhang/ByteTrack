@@ -116,6 +116,11 @@ class MOTEvaluator:
         n_samples = len(self.dataloader) - 1
 
         if trt_file is not None:
+
+            # import pdb
+            # pdb.set_trace()
+            #debugger
+
             from torch2trt import TRTModule
 
             model_trt = TRTModule()
@@ -124,12 +129,13 @@ class MOTEvaluator:
             x = torch.ones(1, 3, test_size[0], test_size[1]).cuda()
             model(x)
             model = model_trt
-            
+  
         tracker = BYTETracker(self.args)
         ori_thresh = self.args.track_thresh
         for cur_iter, (imgs, _, info_imgs, ids) in enumerate(
             progress_bar(self.dataloader)
         ):
+            print("Please wait, loading...") #Checkpoint that has failed.
             with torch.no_grad():
                 # init tracker
                 frame_id = info_imgs[2].item()
