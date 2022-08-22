@@ -40,7 +40,7 @@ Multi-object tracking (MOT) aims at estimating bounding boxes and identities of 
 ### 1. Installing on the host machine
 Step1. Install ByteTrack.
 ```shell
-git clone https://github.com/ifzhang/ByteTrack.git
+git clone https://github.com/parthmalpathak/ByteTrack_YOLOv5_v6.0.git
 cd ByteTrack
 pip3 install -r requirements.txt
 pip3 install -e .
