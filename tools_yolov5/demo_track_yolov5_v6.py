@@ -80,8 +80,8 @@ def make_parser():
         help="Using TensorRT model for testing.",
     )
     # tracking args
-    parser.add_argument("--track_thresh", type=float, default=0.5, help="tracking confidence threshold")
-    parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
+    parser.add_argument("--track_thresh", type=float, default=0.4, help="tracking confidence threshold")
+    parser.add_argument("--track_buffer", type=int, default=100, help="the frames for keep lost tracks")
     parser.add_argument("--match_thresh", type=float, default=0.8, help="matching threshold for tracking")
     parser.add_argument('--min-box-area', type=float, default=10, help='filter out tiny boxes')
     parser.add_argument("--mot20", dest="mot20", default=False, action="store_true", help="test mot20.")
@@ -155,7 +155,7 @@ class Predictor(object):
         img_info = {"id": 0}
         if isinstance(img, str):
             img_info["file_name"] = os.path.basename(img)
-            img = cv2.imread(img)
+            #img = cv2.imread(img)
         else:
             img_info["file_name"] = None
 
