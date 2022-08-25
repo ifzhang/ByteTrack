@@ -243,6 +243,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
     fps = cap.get(cv2.CAP_PROP_FPS)
+    timestamp = time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
     save_folder = os.path.join(
         vis_folder, time.strftime("%Y_%m_%d_%H_%M_%S", current_time)
     )
@@ -254,7 +255,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     logger.info(f"video save_path is {save_path}")
     vid_writer = cv2.VideoWriter(
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
-    )
+)
     tracker = BYTETracker(args, frame_rate=30)
     timer = Timer()
     frame_id = 0
@@ -263,10 +264,11 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         if frame_id % 20 == 0:
             logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
         ret_val, frame = cap.read()
-        frame = cv2.resize(frame, (1280, 720))
+        # frame = cv2.resize(frame, (1280, 720))
+        # frame = cv2.resize(frame, (640,640))
         if ret_val:
             outputs, img_info = predictor.inference(frame, timer)
-            print("outputs : ", outputs)
+            # print("outputs : ", outputs)
 
             # for i, det in enumerate(outputs):
             if outputs[0] is not None:
@@ -298,6 +300,12 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         else:
             break
         frame_id += 1
+        
+    if args.save_result:
+        res_file = os.path.join(vis_folder, f"{timestamp}.txt")
+        with open(res_file, 'w') as f:
+            f.writelines(results)
+        logger.info(f"save results to {res_file}")
 
 
 def main(exp, args):
