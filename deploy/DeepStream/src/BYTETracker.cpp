@@ -209,7 +209,7 @@ vector<STrack> BYTETracker::update(const vector<NvObject> &nvObjects) {
                  output_stracks.end(),
                  std::back_inserter(filtered_output_stracks),
                  [](STrack track) {
-                     return track.associatedObjectIn != NULL
+                     return track.associatedObjectIn != NULL;
                  });
     return filtered_output_stracks;
 }
