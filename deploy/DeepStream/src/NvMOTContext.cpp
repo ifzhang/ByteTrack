@@ -29,7 +29,7 @@ NvMOTStatus NvMOTContext::processFrame(const NvMOTProcessParams *params, NvMOTTr
 
         std::vector<STrack> outputTracks = byteTrackerMap.at(frame->streamID)->update(nvObjects);
 
-        NvMOTTrackedObj *trackedObjs = new NvMOTTrackedObj[512];
+        NvMOTTrackedObj *trackedObjs = new NvMOTTrackedObj[outputTracks.size()];
         int             filled       = 0;
 
         for (STrack &sTrack: outputTracks) {
@@ -51,7 +51,7 @@ NvMOTStatus NvMOTContext::processFrame(const NvMOTProcessParams *params, NvMOTTr
         trackedObjList->valid        = true;
         trackedObjList->list         = trackedObjs;
         trackedObjList->numFilled    = filled;
-        trackedObjList->numAllocated = 512;
+        trackedObjList->numAllocated = outputTracks.size();
     }
 }
 
