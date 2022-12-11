@@ -15,9 +15,9 @@
 > *[arXiv 2110.06864](https://arxiv.org/abs/2110.06864)*
 
 ## Demo Links
-| Google Colab demo | Huggingface Demo | Original Paper: ByteTrack |
-|:-:|:-:|:-:|
-|[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bDilg4cmXFa8HCKHbsZ_p16p0vrhLyu0?usp=sharing)|[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/akhaliq/bytetrack)|[arXiv 2110.06864](https://arxiv.org/abs/2110.06864)|
+| Google Colab Demo | Huggingface Demo |                  YouTube Tutorial                   | Original Paper: ByteTrack |
+|:-----------------:|:----------------:|:---------------------------------------------------:|:-------------------------:|
+|[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bDilg4cmXFa8HCKHbsZ_p16p0vrhLyu0?usp=sharing)|[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/akhaliq/bytetrack)|[![YouTube](https://badges.aleen42.com/src/youtube.svg)](https://youtu.be/QCG8QMhga9k)|[arXiv 2110.06864](https://arxiv.org/abs/2110.06864) |
 * Integrated to [Huggingface Spaces](https://huggingface.co/spaces) with [Gradio](https://github.com/gradio-app/gradio).
 
 
