@@ -178,7 +178,7 @@ class BYTETracker(object):
         inds_low = scores > 0.1
         inds_high = scores < self.args.track_thresh
 
-        inds_second = np.logical_and(inds_low, inds_high)
+        inds_second = np.logical_and(inds_low, inds_high).bool()
         dets_second = bboxes[inds_second]
         dets = bboxes[remain_inds]
         scores_keep = scores[remain_inds]
@@ -282,6 +282,7 @@ class BYTETracker(object):
         self.lost_stracks.extend(lost_stracks)
         self.lost_stracks = sub_stracks(self.lost_stracks, self.removed_stracks)
         self.removed_stracks.extend(removed_stracks)
+        self.removed_stracks = [track for track in self.removed_stracks if self.frame_id - track.end_frame < 10 * self.max_time_lost]
         self.tracked_stracks, self.lost_stracks = remove_duplicate_stracks(self.tracked_stracks, self.lost_stracks)
         # get scores of lost tracks
         output_stracks = [track for track in self.tracked_stracks if track.is_activated]
