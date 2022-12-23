@@ -158,7 +158,7 @@ class BYTETracker(object):
         self.max_time_lost = self.buffer_size
         self.kalman_filter = KalmanFilter()
 
-    def update(self, output_results, img_info, img_size, det_idxs=None):
+    def update(self, output_results, img_info, img_size):
         self.frame_id += 1
         activated_starcks = []
         refind_stracks = []
@@ -171,7 +171,7 @@ class BYTETracker(object):
         elif output_results.shape[1] == 6:
             scores = output_results[:, 4] 
             bboxes = output_results[:, :4]  # x1y1x2y2
-            det_idxs = output_results[:, 5]
+            _det_idxs = output_results[:, 5]
         else:
             output_results = output_results.cpu().numpy()
             scores = output_results[:, 4] * output_results[:, 5]
@@ -189,8 +189,8 @@ class BYTETracker(object):
         dets = bboxes[remain_inds]
         scores_keep = scores[remain_inds]
         scores_second = scores[inds_second]
-        det_idxs = det_idxs[remain_inds]
-        det_idxs_second = det_idxs[inds_second]
+        det_idxs = _det_idxs[remain_inds]
+        det_idxs_second = _det_idxs[inds_second]
 
         if len(dets) > 0:
             '''Detections'''
