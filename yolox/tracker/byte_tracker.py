@@ -174,7 +174,7 @@ class BYTETracker(object):
         Args:
             output_results: detection results + Scores + det_idx (optional)
             img_info: original image information
-            img_size: scaled image size
+            img_size: inference scaled image size
             track_det_idx: whether to track det_idx (index corresponding to the detection results)
         """
         self.frame_id += 1
