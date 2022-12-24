@@ -12,7 +12,14 @@ from .basetrack import BaseTrack, TrackState
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
-    def __init__(self, tlwh, score, det_idx=0):
+    def __init__(self, tlwh, score, det_idx=None):
+        """
+        Initialize a tracklet
+        Args:
+            tlwh: (np.ndarray) bbox in format x1,y1,x2,y2
+            score: (float) bbox detection score
+            det_idx: (int) (Optional) corresponding index in object detection list
+        """
 
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=np.float)
@@ -69,7 +76,6 @@ class STrack(BaseTrack):
         if new_id:
             self.track_id = self.next_id()
         self.score = new_track.score
-        # TODO: handle det_idx does not exist
         self.det_idx = new_track.det_idx
         
     def update(self, new_track, frame_id):
@@ -91,7 +97,6 @@ class STrack(BaseTrack):
 
         self.score = new_track.score
 
-        # TODO: handle det_idx does not exist
         self.det_idx = new_track.det_idx
 
     @property
@@ -164,6 +169,14 @@ class BYTETracker(object):
         self.kalman_filter = KalmanFilter()
 
     def update(self, output_results, img_info, img_size, track_det_idx=False):
+        """
+        Update tracker with detection results
+        Args:
+            output_results: detection results + Scores + det_idx (optional)
+            img_info: original image information
+            img_size: scaled image size
+            track_det_idx: whether to track det_idx (index corresponding to the detection results)
+        """
         self.frame_id += 1
         activated_starcks = []
         refind_stracks = []
