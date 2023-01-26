@@ -90,8 +90,8 @@ datasets
    |        └——————train
    |        └——————test
    └——————crowdhuman
-   |         └——————Crowdhuman_train
-   |         └——————Crowdhuman_val
+   |         └——————CrowdHuman_train
+   |         └——————CrowdHuman_val
    |         └——————annotation_train.odgt
    |         └——————annotation_val.odgt
    └——————MOT20
