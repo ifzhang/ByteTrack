@@ -311,3 +311,8 @@ YOLOv5 Version 6 pretrained models can be downloaded from [YOLOv5 Model Zoo](htt
 
 1. A large part of the code is borrowed from [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), [FairMOT](https://github.com/ifzhang/FairMOT)[TransTrack](https://github.com/PeizeSun/TransTrack) and [JDE-Cpp](https://github.com/samylee/Towards-Realtime-MOT-Cpp). Many thanks for their wonderful works.
 2. Many thanks to [@ifzhang](https://github.com/ifzhang/ByteTrack) and [@gmt710](https://github.com/gmt710/yolov5ByteTrack) for their contributions to ByteTrack.
+
+## Copyright
+Adding YOLOV5 V6.0 functionality to ByteTrack has been authored by [Parth Malpathak](https://github.com/parthmalpathak)
+
+All the codes and implementatations are a part of Mythic AI research. Please mention proper citations while using this repository
