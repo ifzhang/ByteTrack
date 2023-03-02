@@ -313,6 +313,6 @@ YOLOv5 Version 6 pretrained models can be downloaded from [YOLOv5 Model Zoo](htt
 2. Many thanks to [@ifzhang](https://github.com/ifzhang/ByteTrack) and [@gmt710](https://github.com/gmt710/yolov5ByteTrack) for their contributions to ByteTrack.
 
 ## Copyright
-Adding YOLOV5 V6.0, V6.1 functionality to ByteTrack has been authored by [Parth Malpathak](https://github.com/parthmalpathak)
+Adding YOLOv5 v6.0, v6.1 functionality to ByteTrack has been authored by [Parth Malpathak](https://github.com/parthmalpathak)
 
 All the codes and implementatations are a part of Mythic AI research. Please mention proper citations while using this repository
