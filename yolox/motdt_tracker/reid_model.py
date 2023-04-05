@@ -60,7 +60,7 @@ def load_net(fname, net, prefix='', load_state_dict=False):
                 lr = h5f.attrs['learning_rates']
             else:
                 lr = h5f.attrs.get('lr', -1)
-                lr = np.asarray([lr] if lr > 0 else [], dtype=np.float)
+                lr = np.asarray([lr] if lr > 0 else [], dtype=float)
 
             return epoch, lr
 

@@ -21,7 +21,7 @@ class STrack(BaseTrack):
     def __init__(self, tlwh, score, max_n_features=100, from_det=True):
 
         # wait activate
-        self._tlwh = np.asarray(tlwh, dtype=np.float)
+        self._tlwh = np.asarray(tlwh, dtype=float)
         self.kalman_filter = None
         self.mean, self.covariance = None, None
         self.is_activated = False
@@ -248,7 +248,7 @@ class OnlineTracker(object):
             0.7,
             )
             keep = nms_out_index.numpy()
-            mask = np.zeros(len(rois), dtype=np.bool)
+            mask = np.zeros(len(rois), dtype=bool)
             mask[keep] = True
             keep = np.where(mask & (scores >= self.min_cls_score))[0]
             detections = [detections[i] for i in keep]

@@ -25,15 +25,15 @@ class Tracker(object):
                 self.tracks.append(item)
                 self.nID = 10000
                 self.embedding_bank = np.zeros((self.nID, 128))
-                self.cat_bank = np.zeros((self.nID), dtype=np.int)
+                self.cat_bank = np.zeros((self.nID), dtype=int)
 
     def reset(self):
         self.id_count = 0
         self.nID = 10000
         self.tracks = []
         self.embedding_bank = np.zeros((self.nID, 128))
-        self.cat_bank = np.zeros((self.nID), dtype=np.int)
-        self.tracklet_ages = np.zeros((self.nID), dtype=np.int)
+        self.cat_bank = np.zeros((self.nID), dtype=int)
+        self.tracklet_ages = np.zeros((self.nID), dtype=int)
         self.alive = []
 
     def step(self, results_with_low, public_det=None):
@@ -253,7 +253,7 @@ class Tracker(object):
         a = feat[None, :]
         b = self.embedding_bank[:nID, :]
         if len(b) > 0:
-            alive = np.array(self.alive, dtype=np.int) - 1
+            alive = np.array(self.alive, dtype=int) - 1
             cosim = cosine(a, b)
             cosim = np.reshape(cosim, newshape=(-1))
             cosim[alive] = -2
@@ -272,7 +272,7 @@ class Tracker(object):
         """
         n_ = boxes.shape[0]
         k_ = query_boxes.shape[0]
-        overlaps = np.zeros((n_, k_), dtype=np.float)
+        overlaps = np.zeros((n_, k_), dtype=float)
         for k in range(k_):
             query_box_area = (query_boxes[k, 2] - query_boxes[k, 0] + 1) * (query_boxes[k, 3] - query_boxes[k, 1] + 1)
             for n in range(n_):
