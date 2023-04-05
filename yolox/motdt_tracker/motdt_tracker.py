@@ -248,7 +248,7 @@ class OnlineTracker(object):
             0.7,
             )
             keep = nms_out_index.numpy()
-            mask = np.zeros(len(rois), dtype=np.bool)
+            mask = np.zeros(len(rois), dtype=bool)
             mask[keep] = True
             keep = np.where(mask & (scores >= self.min_cls_score))[0]
             detections = [detections[i] for i in keep]
