@@ -13,7 +13,6 @@ from .basetrack import BaseTrack, TrackState
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
     def __init__(self, tlwh, score):
-
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=np.float)
         self.kalman_filter = None
@@ -44,6 +43,7 @@ class STrack(BaseTrack):
 
     def activate(self, kalman_filter, frame_id):
         """Start a new tracklet"""
+        print('This is:', type(frame_id))
         self.kalman_filter = kalman_filter
         self.track_id = self.next_id()
         self.mean, self.covariance = self.kalman_filter.initiate(self.tlwh_to_xyah(self._tlwh))
