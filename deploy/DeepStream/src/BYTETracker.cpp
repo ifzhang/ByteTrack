@@ -184,10 +184,10 @@ vector<STrack> BYTETracker::update(const vector<NvObject> &nvObjects) {
         this->lost_stracks.push_back(lost_stracks[i]);
     }
 
-    this->lost_stracks = sub_stracks(this->lost_stracks, this->removed_stracks);
-    for (int i = 0; i < removed_stracks.size(); i++) {
-        this->removed_stracks.push_back(removed_stracks[i]);
-    }
+    this->lost_stracks = sub_stracks(this->lost_stracks, removed_stracks);
+    // for (int i = 0; i < removed_stracks.size(); i++) {
+    //     this->removed_stracks.push_back(removed_stracks[i]);
+    // }
 
     remove_duplicate_stracks(resa, resb, this->tracked_stracks, this->lost_stracks);
 
