@@ -31,7 +31,7 @@ for video in $VIDEOS_PATH/*.mov; do
 done
 
 # Post-process renaming
-python post_rename.py
+python tools/post_rename.py
 
 # store txt
 zip -r txt_archive.zip $OUTPUT_PATH/*.txt
