@@ -275,7 +275,7 @@ You can get the tracking results in each frame from 'online_targets'. You can re
 
 ```shell
 cd <ByteTrack_HOME>
-python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --fp16 --fuse --save_result
+python3 demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --fp16 --fuse --save_result
 ```
 
 ## Deploy
