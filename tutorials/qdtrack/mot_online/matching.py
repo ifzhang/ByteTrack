@@ -69,13 +69,13 @@ def ious(atlbrs, btlbrs):
 
     :rtype ious np.ndarray
     """
-    ious = np.zeros((len(atlbrs), len(btlbrs)), dtype=np.float)
+    ious = np.zeros((len(atlbrs), len(btlbrs)), dtype=float)
     if ious.size == 0:
         return ious
 
     ious = bbox_ious(
-        np.ascontiguousarray(atlbrs, dtype=np.float),
-        np.ascontiguousarray(btlbrs, dtype=np.float)
+        np.ascontiguousarray(atlbrs, dtype=float),
+        np.ascontiguousarray(btlbrs, dtype=float)
     )
 
     return ious
@@ -109,13 +109,13 @@ def embedding_distance(tracks, detections, metric='cosine'):
     :return: cost_matrix np.ndarray
     """
 
-    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=np.float)
+    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=float)
     if cost_matrix.size == 0:
         return cost_matrix
-    det_features = np.asarray([track.curr_feat for track in detections], dtype=np.float)
+    det_features = np.asarray([track.curr_feat for track in detections], dtype=float)
     #for i, track in enumerate(tracks):
         #cost_matrix[i, :] = np.maximum(0.0, cdist(track.smooth_feat.reshape(1,-1), det_features, metric))
-    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=np.float)
+    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=float)
     cost_matrix = np.maximum(0.0, cdist(track_features, det_features, metric))  # Nomalized features
     return cost_matrix
 
@@ -127,17 +127,17 @@ def embedding_distance2(tracks, detections, metric='cosine'):
     :return: cost_matrix np.ndarray
     """
 
-    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=np.float)
+    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=float)
     if cost_matrix.size == 0:
         return cost_matrix
-    det_features = np.asarray([track.curr_feat for track in detections], dtype=np.float)
+    det_features = np.asarray([track.curr_feat for track in detections], dtype=float)
     #for i, track in enumerate(tracks):
         #cost_matrix[i, :] = np.maximum(0.0, cdist(track.smooth_feat.reshape(1,-1), det_features, metric))
-    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=np.float)
+    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=float)
     cost_matrix = np.maximum(0.0, cdist(track_features, det_features, metric))  # Nomalized features
-    track_features = np.asarray([track.features[0] for track in tracks], dtype=np.float)
+    track_features = np.asarray([track.features[0] for track in tracks], dtype=float)
     cost_matrix2 = np.maximum(0.0, cdist(track_features, det_features, metric))  # Nomalized features
-    track_features = np.asarray([track.features[len(track.features)-1] for track in tracks], dtype=np.float)
+    track_features = np.asarray([track.features[len(track.features)-1] for track in tracks], dtype=float)
     cost_matrix3 = np.maximum(0.0, cdist(track_features, det_features, metric))  # Nomalized features
     for row in range(len(cost_matrix)):
         cost_matrix[row] = (cost_matrix[row]+cost_matrix2[row]+cost_matrix3[row])/3
@@ -149,11 +149,11 @@ def vis_id_feature_A_distance(tracks, detections, metric='cosine'):
     det_features = []
     leg1 = len(tracks)
     leg2 = len(detections)
-    cost_matrix = np.zeros((leg1, leg2), dtype=np.float)
-    cost_matrix_det = np.zeros((leg1, leg2), dtype=np.float)
-    cost_matrix_track = np.zeros((leg1, leg2), dtype=np.float)
-    det_features = np.asarray([track.curr_feat for track in detections], dtype=np.float)
-    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=np.float)
+    cost_matrix = np.zeros((leg1, leg2), dtype=float)
+    cost_matrix_det = np.zeros((leg1, leg2), dtype=float)
+    cost_matrix_track = np.zeros((leg1, leg2), dtype=float)
+    det_features = np.asarray([track.curr_feat for track in detections], dtype=float)
+    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=float)
     if leg2 != 0:
         cost_matrix_det = np.maximum(0.0, cdist(det_features, det_features, metric))
     if leg1 != 0:
@@ -167,8 +167,8 @@ def vis_id_feature_A_distance(tracks, detections, metric='cosine'):
     if leg2 > 10:
         leg2 = 10
         detections = detections[:10]
-    det_features = np.asarray([track.curr_feat for track in detections], dtype=np.float)
-    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=np.float)
+    det_features = np.asarray([track.curr_feat for track in detections], dtype=float)
+    track_features = np.asarray([track.smooth_feat for track in tracks], dtype=float)
     return track_features, det_features, cost_matrix, cost_matrix_det, cost_matrix_track
 
 def gate_cost_matrix(kf, cost_matrix, tracks, detections, only_position=False):
