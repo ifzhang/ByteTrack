@@ -39,13 +39,13 @@ def ious(atlbrs, btlbrs):
     :type atlbrs: list[tlbr] | np.ndarray
     :rtype ious np.ndarray
     """
-    ious = np.zeros((len(atlbrs), len(btlbrs)), dtype=np.float)
+    ious = np.zeros((len(atlbrs), len(btlbrs)), dtype=float)
     if ious.size == 0:
         return ious
 
     ious = bbox_ious(
-        np.ascontiguousarray(atlbrs, dtype=np.float),
-        np.ascontiguousarray(btlbrs, dtype=np.float)
+        np.ascontiguousarray(atlbrs, dtype=float),
+        np.ascontiguousarray(btlbrs, dtype=float)
     )
 
     return ious
@@ -73,7 +73,7 @@ def nearest_reid_distance(tracks, detections, metric='cosine'):
     :type detections: list[BaseTrack]
     :rtype cost_matrix np.ndarray
     """
-    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=np.float)
+    cost_matrix = np.zeros((len(tracks), len(detections)), dtype=float)
     if cost_matrix.size == 0:
         return cost_matrix
 
@@ -92,7 +92,7 @@ def mean_reid_distance(tracks, detections, metric='cosine'):
     :type metric: str
     :rtype cost_matrix np.ndarray
     """
-    cost_matrix = np.empty((len(tracks), len(detections)), dtype=np.float)
+    cost_matrix = np.empty((len(tracks), len(detections)), dtype=float)
     if cost_matrix.size == 0:
         return cost_matrix
 
