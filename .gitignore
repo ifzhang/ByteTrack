@@ -107,6 +107,7 @@ celerybeat.pid
 env/
 venv/
 ENV/
+trackenv/
 env.bak/
 venv.bak/
 
@@ -136,6 +137,13 @@ docs/api
 *.pth
 *.onnx
 *.engine
+*.pt
 events.out.tfevents*
 pretrained
 YOLOX_outputs
+
+
+#dirs
+required_models/
+trackenv/
+results/
