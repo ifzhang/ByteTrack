@@ -34,7 +34,7 @@ vector<STrack> BYTETracker::joint_stracks(vector<STrack> &tlista, vector<STrack>
 	for (int i = 0; i < tlistb.size(); i++)
 	{
 		int tid = tlistb[i].track_id;
-		if (!exists[tid] || exists.count(tid) == 0)
+		if (exists.count(tid) == 0 || !exists[tid])
 		{
 			exists[tid] = 1;
 			res.push_back(tlistb[i]);
