@@ -1,8 +1,8 @@
 # TODO: Update with exact module version
 matplotlib==3.6.3
 numpy==1.26.4
-torch==2.2.0
-torchvision==0.17.0
+torch==2.6.0
+torchvision==0.21.0
 opencv_python==4.7.0.72
 loguru==0.7.0
 scikit-image
