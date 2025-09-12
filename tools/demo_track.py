@@ -4,20 +4,22 @@ import os.path as osp
 import time
 import cv2
 import torch
-
 from loguru import logger
+import cupy as cp
 
-from yolox.data.data_augment import preproc
+import sys
+sys.path.append('.')
+
+
+from yolox.data.data_augment import preproc, preproc_with_cupy
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess
 from yolox.utils.visualize import plot_tracking
 from yolox.tracker.byte_tracker import BYTETracker
 from yolox.tracking_utils.timer import Timer
-
+from concurrent.futures import ThreadPoolExecutor
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
-
-
 def make_parser():
     parser = argparse.ArgumentParser("ByteTrack Demo!")
     parser.add_argument(
@@ -100,7 +102,6 @@ def get_image_list(path):
                 image_names.append(apath)
     return image_names
 
-
 def write_results(filename, results):
     save_format = '{frame},{id},{x1},{y1},{w},{h},{s},-1,-1,-1\n'
     with open(filename, 'w') as f:
@@ -113,7 +114,6 @@ def write_results(filename, results):
                 f.write(line)
     logger.info('save results to {}'.format(filename))
 
-
 class Predictor(object):
     def __init__(
         self,
@@ -121,7 +121,7 @@ class Predictor(object):
         exp,
         trt_file=None,
         decoder=None,
-        device=torch.device("cpu"),
+        device=None,
         fp16=False
     ):
         self.model = model
@@ -130,7 +130,7 @@ class Predictor(object):
         self.confthre = exp.test_conf
         self.nmsthre = exp.nmsthre
         self.test_size = exp.test_size
-        self.device = device
+        self.device = str(device)
         self.fp16 = fp16
         if trt_file is not None:
             from torch2trt import TRTModule
@@ -157,9 +157,20 @@ class Predictor(object):
         img_info["width"] = width
         img_info["raw_img"] = img
 
-        img, ratio = preproc(img, self.test_size, self.rgb_means, self.std)
-        img_info["ratio"] = ratio
-        img = torch.from_numpy(img).unsqueeze(0).float().to(self.device)
+        if self.device=='cuda':
+            img=[img]
+            processed_images = self.process_images(img, self.test_size, self.rgb_means, self.std)
+
+            if processed_images:
+                img = processed_images[0][0]
+                img_info["ratio"] = processed_images[0][1]
+
+            img = torch.from_numpy(cp.asnumpy(img)).unsqueeze(0).float().to(self.device)
+        else:
+            img, ratio = preproc(img, self.test_size, self.rgb_means, self.std)
+            img_info["ratio"] = ratio
+            img = torch.from_numpy(img).unsqueeze(0).float().to(self.device)
+
         if self.fp16:
             img = img.half()  # to FP16
 
@@ -174,6 +185,12 @@ class Predictor(object):
             #logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info
 
+    def process_images(self, image_list, input_size, mean, std, swap=(2, 0, 1)):
+        with ThreadPoolExecutor() as executor:
+            futures= [executor.submit(preproc_with_cupy, img, input_size, mean, std, swap) for img in image_list]
+            results = [future.result() for future in futures]
+        if results:
+            return results
 
 def image_demo(predictor, vis_folder, current_time, args):
     if osp.isdir(args.path):

@@ -1,300 +1,113 @@
-# ByteTrack
+# YOLOX-Bytetrack Algorithm Optimization with CuPy
 
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/bytetrack-multi-object-tracking-by-1/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=bytetrack-multi-object-tracking-by-1)
+#### This repository contains an optimized version of the YOLOX-Bytetrack algorithm.
 
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/bytetrack-multi-object-tracking-by-1/multi-object-tracking-on-mot20-1)](https://paperswithcode.com/sota/multi-object-tracking-on-mot20-1?p=bytetrack-multi-object-tracking-by-1)
+This repository began as a fork of the excellent FoundationVision/ByteTrack project, created to develop and contribute GPU-accelerated preprocessing enhancements.
 
-#### ByteTrack is a simple, fast and strong multi-object tracker.
-
-<p align="center"><img src="assets/sota.png" width="500"/></p>
-
-> [**ByteTrack: Multi-Object Tracking by Associating Every Detection Box**](https://arxiv.org/abs/2110.06864)
-> 
-> Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Fucheng Weng, Zehuan Yuan, Ping Luo, Wenyu Liu, Xinggang Wang
-> 
-> *[arXiv 2110.06864](https://arxiv.org/abs/2110.06864)*
-
-## Demo Links
-| Google Colab Demo | Huggingface Demo |                  YouTube Tutorial                   | Original Paper: ByteTrack |
-|:-----------------:|:----------------:|:---------------------------------------------------:|:-------------------------:|
-|[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1bDilg4cmXFa8HCKHbsZ_p16p0vrhLyu0?usp=sharing)|[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/akhaliq/bytetrack)|[![YouTube](https://badges.aleen42.com/src/youtube.svg)](https://youtu.be/QCG8QMhga9k)|[arXiv 2110.06864](https://arxiv.org/abs/2110.06864) |
-* Integrated to [Huggingface Spaces](https://huggingface.co/spaces) with [Gradio](https://github.com/gradio-app/gradio).
-
+The core optimizations, which involve replacing NumPy with CuPy and implementing multithreading, were submitted back to the original project in Pull Request #402. This repository now serves as a standalone, performance-focused implementation for users seeking maximum preprocessing speed via GPU acceleration.
 
 ## Abstract
-Multi-object tracking (MOT) aims at estimating bounding boxes and identities of objects in videos. Most methods obtain identities by associating detection boxes whose scores are higher than a threshold. The objects with low detection scores, e.g. occluded objects, are simply thrown away, which brings non-negligible true object missing and fragmented trajectories. To solve this problem, we present a simple, effective and generic association method, tracking by associating every detection box instead of only the high score ones. For the low score detection boxes, we utilize their similarities with tracklets to recover true objects and filter out the background detections. When applied to 9 different state-of-the-art trackers, our method achieves consistent improvement on IDF1 scores ranging from 1 to 10 points. To put forwards the state-of-the-art performance of MOT, we design a simple and strong tracker, named ByteTrack. For the first time, we achieve 80.3 MOTA, 77.3 IDF1 and 63.1 HOTA on the test set of MOT17 with 30 FPS running speed on a single V100 GPU.
-<p align="center"><img src="assets/teasing.png" width="400"/></p>
+The primary enhancement involves the use of CuPy instead of NumPy for the `preproc` function, resulting in significant performance improvements for the preprocessing stage. The changes also include the utilization of multithreading for parallel processing of multiple images.
 
-## News
-* (2022.07) Our paper is accepted by ECCV 2022!
-* (2022.06) A [nice re-implementation](https://github.com/PaddlePaddle/PaddleDetection/tree/develop/configs/mot/bytetrack) by Baidu [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection)!
+## Key Improvements
+### 1. CuPy Integration
+The original `preproc` function used NumPy for various operations, which are now replaced with CuPy to leverage GPU acceleration. This change drastically reduces the preprocessing time, especially when dealing with large batches of images.
 
-## Tracking performance
-### Results on MOT challenge test set
-| Dataset    |  MOTA | IDF1 | HOTA | MT | ML | FP | FN | IDs | FPS |
-|------------|-------|------|------|-------|-------|------|------|------|------|
-|MOT17       | 80.3 | 77.3 | 63.1 | 53.2% | 14.5% | 25491 | 83721 | 2196 | 29.6 |
-|MOT20       | 77.8 | 75.2 | 61.3 | 69.2% | 9.5%  | 26249 | 87594 | 1223 | 13.7 |
+**Original `preproc` Function**
+```python
+def preproc(image, input_size, mean, std, swap=(2, 0, 1)):
+    if len(image.shape) == 3:
+        padded_img = np.ones((input_size[0], input_size[1], 3)) * 114.0
+    else:
+        padded_img = np.ones(input_size) * 114.0
+    img = np.array(image)
+    r = min(input_size[0] / img.shape[0], input_size[1] / img.shape[1])
+    resized_img = cv2.resize(
+        img,
+        (int(img.shape[1] * r), int(img.shape[0] * r)),
+        interpolation=cv2.INTER_LINEAR,
+    ).astype(np.float32)
+    padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img
 
-### Visualization results on MOT challenge test set
-<img src="assets/MOT17-01-SDP.gif" width="400"/>   <img src="assets/MOT17-07-SDP.gif" width="400"/>
-<img src="assets/MOT20-07.gif" width="400"/>   <img src="assets/MOT20-08.gif" width="400"/>
-
-## Installation
-### 1. Installing on the host machine
-Step1. Install ByteTrack.
-```shell
-git clone https://github.com/ifzhang/ByteTrack.git
-cd ByteTrack
-pip3 install -r requirements.txt
-python3 setup.py develop
+    padded_img = padded_img[:, :, ::-1]
+    padded_img /= 255.0
+    if mean is not None:
+        padded_img -= mean
+    if std is not None:
+        padded_img /= std
+    padded_img = padded_img.transpose(swap)
+    padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
+    return padded_img, r
 ```
 
-Step2. Install [pycocotools](https://github.com/cocodataset/cocoapi).
+**Optimized preproc Function with CuPy**   
+```python
+def preproc_with_cupy(image, input_size, mean, std, swap=(2, 0, 1)):
+    device = cp.cuda.Device(0)
+    device.use()
 
-```shell
-pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+    if len(image.shape) == 3:
+        padded_img = cp.ones((input_size[0], input_size[1], 3)) * 114.0
+    else:
+        padded_img = cp.ones(input_size) * 114.0
+
+    img = cp.array(image)
+    r = min(input_size[0] / img.shape[0], input_size[1] / img.shape[1])
+
+    target_height = int(img.shape[0] * r)
+    target_width = int(img.shape[1] * r)
+
+    if target_height <= 0 or target_width <= 0:
+        raise ValueError(f"Invalid target size: ({target_width}, {target_height})")
+
+    resized_img = cp.array(cv2.resize(
+        cp.asnumpy(img),
+        (target_width, target_height),
+        interpolation=cv2.INTER_LINEAR,
+    ).astype(np.float32))
+
+    if len(image.shape) == 3:
+        padded_img[:target_height, :target_width, :] = resized_img
+    else:
+        padded_img[:target_height, :target_width] = resized_img
+
+    padded_img = padded_img[:, :, ::-1] / 255.0  # BGR to RGB and normalize
+
+    if mean is not None:
+        mean_array = cp.array(mean).reshape(1, 1, 3)
+        padded_img -= mean_array
+
+    if std is not None:
+        std_array = cp.array(std).reshape(1, 1, 3)
+        padded_img /= std_array
+
+    padded_img = padded_img.transpose(swap)
+    padded_img = cp.ascontiguousarray(padded_img, dtype=cp.float32)
+    return padded_img, r
 ```
+### 2. Multithreading for Image Processing
 
-Step3. Others
-```shell
-pip3 install cython_bbox
+To further enhance performance, the process_images method now uses multithreading to preprocess multiple images in parallel. This change utilizes Python's ThreadPoolExecutor to handle image preprocessing concurrently.
+
+**Added process_images Method**  
+
+```python
+    def process_images(self, image_list, input_size, mean, std, swap=(2, 0, 1)):
+        with ThreadPoolExecutor() as executor:
+            futures= [executor.submit(preproc_with_cupy, img, input_size, mean, std, swap) for img in image_list]
+            results = [future.result() for future in futures]
+        if results:
+            return results
 ```
-### 2. Docker build
-```shell
-docker build -t bytetrack:latest .
-
-# Startup sample
-mkdir -p pretrained && \
-mkdir -p YOLOX_outputs && \
-xhost +local: && \
-docker run --gpus all -it --rm \
--v $PWD/pretrained:/workspace/ByteTrack/pretrained \
--v $PWD/datasets:/workspace/ByteTrack/datasets \
--v $PWD/YOLOX_outputs:/workspace/ByteTrack/YOLOX_outputs \
--v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
---device /dev/video0:/dev/video0:mwr \
---net=host \
--e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
--e DISPLAY=$DISPLAY \
---privileged \
-bytetrack:latest
-```
-
-## Data preparation
-
-Download [MOT17](https://motchallenge.net/), [MOT20](https://motchallenge.net/), [CrowdHuman](https://www.crowdhuman.org/), [Cityperson](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md), [ETHZ](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) and put them under <ByteTrack_HOME>/datasets in the following structure:
-```
-datasets
-   |——————mot
-   |        └——————train
-   |        └——————test
-   └——————crowdhuman
-   |         └——————Crowdhuman_train
-   |         └——————Crowdhuman_val
-   |         └——————annotation_train.odgt
-   |         └——————annotation_val.odgt
-   └——————MOT20
-   |        └——————train
-   |        └——————test
-   └——————Cityscapes
-   |        └——————images
-   |        └——————labels_with_ids
-   └——————ETHZ
-            └——————eth01
-            └——————...
-            └——————eth07
-```
-
-Then, you need to turn the datasets to COCO format and mix different training data:
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/convert_mot17_to_coco.py
-python3 tools/convert_mot20_to_coco.py
-python3 tools/convert_crowdhuman_to_coco.py
-python3 tools/convert_cityperson_to_coco.py
-python3 tools/convert_ethz_to_coco.py
-```
-
-Before mixing different datasets, you need to follow the operations in [mix_xxx.py](https://github.com/ifzhang/ByteTrack/blob/c116dfc746f9ebe07d419caa8acba9b3acfa79a6/tools/mix_data_ablation.py#L6) to create a data folder and link. Finally, you can mix the training data:
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/mix_data_ablation.py
-python3 tools/mix_data_test_mot17.py
-python3 tools/mix_data_test_mot20.py
-```
-
-
-## Model zoo
-
-### Ablation model
-
-Train on CrowdHuman and MOT17 half train, evaluate on MOT17 half val
-
-| Model    |  MOTA | IDF1 | IDs | FPS |
-|------------|-------|------|------|------|
-|ByteTrack_ablation [[google]](https://drive.google.com/file/d/1iqhM-6V_r1FpOlOzrdP_Ejshgk0DxOob/view?usp=sharing), [[baidu(code:eeo8)]](https://pan.baidu.com/s/1W5eRBnxc4x9V8gm7dgdEYg) | 76.6 | 79.3 | 159 | 29.6 |
-
-### MOT17 test model
-
-Train on CrowdHuman, MOT17, Cityperson and ETHZ, evaluate on MOT17 train.
-
-* **Standard models**
-
-| Model    |  MOTA | IDF1 | IDs | FPS |
-|------------|-------|------|------|------|
-|bytetrack_x_mot17 [[google]](https://drive.google.com/file/d/1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5/view?usp=sharing), [[baidu(code:ic0i)]](https://pan.baidu.com/s/1OJKrcQa_JP9zofC6ZtGBpw) | 90.0 | 83.3 | 422 | 29.6 |
-|bytetrack_l_mot17 [[google]](https://drive.google.com/file/d/1XwfUuCBF4IgWBWK2H7oOhQgEj9Mrb3rz/view?usp=sharing), [[baidu(code:1cml)]](https://pan.baidu.com/s/1242adimKM6TYdeLU2qnuRA) | 88.7 | 80.7 | 460 | 43.7 |
-|bytetrack_m_mot17 [[google]](https://drive.google.com/file/d/11Zb0NN_Uu7JwUd9e6Nk8o2_EUfxWqsun/view?usp=sharing), [[baidu(code:u3m4)]](https://pan.baidu.com/s/1fKemO1uZfvNSLzJfURO4TQ) | 87.0 | 80.1 | 477 | 54.1 |
-|bytetrack_s_mot17 [[google]](https://drive.google.com/file/d/1uSmhXzyV1Zvb4TJJCzpsZOIcw7CCJLxj/view?usp=sharing), [[baidu(code:qflm)]](https://pan.baidu.com/s/1PiP1kQfgxAIrnGUbFP6Wfg) | 79.2 | 74.3 | 533 | 64.5 |
-
-* **Light models**
-
-| Model    |  MOTA | IDF1 | IDs | Params(M) | FLOPs(G) |
-|------------|-------|------|------|------|-------|
-|bytetrack_nano_mot17 [[google]](https://drive.google.com/file/d/1AoN2AxzVwOLM0gJ15bcwqZUpFjlDV1dX/view?usp=sharing), [[baidu(code:1ub8)]](https://pan.baidu.com/s/1dMxqBPP7lFNRZ3kFgDmWdw) | 69.0 | 66.3 | 531 | 0.90 | 3.99 |
-|bytetrack_tiny_mot17 [[google]](https://drive.google.com/file/d/1LFAl14sql2Q5Y9aNFsX_OqsnIzUD_1ju/view?usp=sharing), [[baidu(code:cr8i)]](https://pan.baidu.com/s/1jgIqisPSDw98HJh8hqhM5w) | 77.1 | 71.5 | 519 | 5.03 | 24.45 |
-
-
-
-### MOT20 test model
-
-Train on CrowdHuman and MOT20, evaluate on MOT20 train.
-
-
-| Model    |  MOTA | IDF1 | IDs | FPS |
-|------------|-------|------|------|------|
-|bytetrack_x_mot20 [[google]](https://drive.google.com/file/d/1HX2_JpMOjOIj1Z9rJjoet9XNy_cCAs5U/view?usp=sharing), [[baidu(code:3apd)]](https://pan.baidu.com/s/1bowJJj0bAnbhEQ3_6_Am0A) | 93.4 | 89.3 | 1057 | 17.5 |
-
-
-## Training
-
-The COCO pretrained YOLOX model can be downloaded from their [model zoo](https://github.com/Megvii-BaseDetection/YOLOX/tree/0.1.0). After downloading the pretrained models, you can put them under <ByteTrack_HOME>/pretrained.
-
-* **Train ablation model (MOT17 half train and CrowdHuman)**
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/train.py -f exps/example/mot/yolox_x_ablation.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
-```
-
-* **Train MOT17 test model (MOT17 train, CrowdHuman, Cityperson and ETHZ)**
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/train.py -f exps/example/mot/yolox_x_mix_det.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
-```
-
-* **Train MOT20 test model (MOT20 train, CrowdHuman)**
-
-For MOT20, you need to clip the bounding boxes inside the image.
-
-Add clip operation in [line 134-135 in data_augment.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/data_augment.py#L134), [line 122-125 in mosaicdetection.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/datasets/mosaicdetection.py#L122), [line 217-225 in mosaicdetection.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/data/datasets/mosaicdetection.py#L217), [line 115-118 in boxes.py](https://github.com/ifzhang/ByteTrack/blob/72cd6dd24083c337a9177e484b12bb2b5b3069a6/yolox/utils/boxes.py#L115).
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/train.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
-```
-
-* **Train custom dataset**
-
-First, you need to prepare your dataset in COCO format. You can refer to [MOT-to-COCO](https://github.com/ifzhang/ByteTrack/blob/main/tools/convert_mot17_to_coco.py) or [CrowdHuman-to-COCO](https://github.com/ifzhang/ByteTrack/blob/main/tools/convert_crowdhuman_to_coco.py). Then, you need to create a Exp file for your dataset. You can refer to the [CrowdHuman](https://github.com/ifzhang/ByteTrack/blob/main/exps/example/mot/yolox_x_ch.py) training Exp file. Don't forget to modify get_data_loader() and get_eval_loader in your Exp file. Finally, you can train bytetrack on your dataset by running:
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/train.py -f exps/example/mot/your_exp_file.py -d 8 -b 48 --fp16 -o -c pretrained/yolox_x.pth
-```
-
-
-## Tracking
-
-* **Evaluation on MOT17 half val**
-
-Run ByteTrack:
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/track.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
-```
-You can get 76.6 MOTA using our pretrained model.
-
-Run other trackers:
-```shell
-python3 tools/track_sort.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
-python3 tools/track_deepsort.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
-python3 tools/track_motdt.py -f exps/example/mot/yolox_x_ablation.py -c pretrained/bytetrack_ablation.pth.tar -b 1 -d 1 --fp16 --fuse
-```
-
-* **Test on MOT17**
-
-Run ByteTrack:
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/track.py -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar -b 1 -d 1 --fp16 --fuse
-python3 tools/interpolation.py
-```
-Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and you can get 79+ MOTA (For 80+ MOTA, you need to carefully tune the test image size and high score detection threshold of each sequence).
-
-* **Test on MOT20**
-
-We use the input size 1600 x 896 for MOT20-04, MOT20-07 and 1920 x 736 for MOT20-06, MOT20-08. You can edit it in [yolox_x_mix_mot20_ch.py](https://github.com/ifzhang/ByteTrack/blob/main/exps/example/mot/yolox_x_mix_mot20_ch.py)
-
-Run ByteTrack:
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/track.py -f exps/example/mot/yolox_x_mix_mot20_ch.py -c pretrained/bytetrack_x_mot20.pth.tar -b 1 -d 1 --fp16 --fuse --match_thresh 0.7 --mot20
-python3 tools/interpolation.py
-```
-Submit the txt files to [MOTChallenge](https://motchallenge.net/) website and you can get 77+ MOTA (For higher MOTA, you need to carefully tune the test image size and high score detection threshold of each sequence).
-
-## Applying BYTE to other trackers
-
-See [tutorials](https://github.com/ifzhang/ByteTrack/tree/main/tutorials).
-
-## Combining BYTE with other detectors
-
-Suppose you have already got the detection results 'dets' (x1, y1, x2, y2, score) from other detectors, you can simply pass the detection results to BYTETracker (you need to first modify some post-processing code according to the format of your detection results in [byte_tracker.py](https://github.com/ifzhang/ByteTrack/blob/main/yolox/tracker/byte_tracker.py)):
-
-```
-from yolox.tracker.byte_tracker import BYTETracker
-tracker = BYTETracker(args)
-for image in images:
-   dets = detector(image)
-   online_targets = tracker.update(dets, info_imgs, img_size)
-```
-
-You can get the tracking results in each frame from 'online_targets'. You can refer to [mot_evaluators.py](https://github.com/ifzhang/ByteTrack/blob/main/yolox/evaluators/mot_evaluator.py) to pass the detection results to BYTETracker.
-
-## Demo
-
-<img src="assets/palace_demo.gif" width="600"/>
-
-```shell
-cd <ByteTrack_HOME>
-python3 tools/demo_track.py video -f exps/example/mot/yolox_x_mix_det.py -c pretrained/bytetrack_x_mot17.pth.tar --fp16 --fuse --save_result
-```
-
-## Deploy
-
-1.  [ONNX export and ONNXRuntime](./deploy/ONNXRuntime)
-2.  [TensorRT in Python](./deploy/TensorRT/python)
-3.  [TensorRT in C++](./deploy/TensorRT/cpp)
-4.  [ncnn in C++](./deploy/ncnn/cpp)
-5.  [Deepstream](./deploy/DeepStream)
-
-## Citation
-
-```
-@article{zhang2022bytetrack,
-  title={ByteTrack: Multi-Object Tracking by Associating Every Detection Box},
-  author={Zhang, Yifu and Sun, Peize and Jiang, Yi and Yu, Dongdong and Weng, Fucheng and Yuan, Zehuan and Luo, Ping and Liu, Wenyu and Wang, Xinggang},
-  booktitle={Proceedings of the European Conference on Computer Vision (ECCV)},
-  year={2022}
-}
+## Result
+The integration of CuPy and the use of multithreading have significantly improved the preprocessing time for image batches. Below is a comparison of the preprocessing time before and after the optimization:
+The tests resulted in an FPS increase of around 1.5X-2X, depending on the graphics card used and the type of model.
+
+**Before optimization**
+<p align="center"><img src="assets/without_cupy.png" width="500"/></p>
+
+**After optimization**
+<p align="center"><img src="assets/with_cupy.png" width="500"/></p>
 ```
 
 ## Acknowledgement

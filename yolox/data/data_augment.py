@@ -11,14 +11,10 @@ http://arxiv.org/abs/1512.02325
 
 import cv2
 import numpy as np
-
-import torch
-
 from yolox.utils import xyxy2cxcywh
-
 import math
 import random
-
+import cupy as cp
 
 def augment_hsv(img, hgain=0.015, sgain=0.7, vgain=0.4):
     r = np.random.uniform(-1, 1, 3) * [hgain, sgain, vgain] + 1  # random gains
@@ -210,6 +206,50 @@ def preproc(image, input_size, mean, std, swap=(2, 0, 1)):
     padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
     return padded_img, r
 
+def preproc_with_cupy(image, input_size, mean, std, swap=(2, 0, 1)):
+    device = cp.cuda.Device(0)
+    device.use()
+
+    if len(image.shape) == 3:
+        padded_img = cp.ones((input_size[0], input_size[1], 3)) * 114.0
+    else:
+        padded_img = cp.ones(input_size) * 114.0
+
+    img = cp.array(image)
+    r = min(input_size[0] / img.shape[0], input_size[1] / img.shape[1])
+
+    # Hedef boyutları hesaplayalım
+    target_height = int(img.shape[0] * r)
+    target_width = int(img.shape[1] * r)
+
+    # Hedef boyutların sıfır veya negatif olmadığını kontrol edelim
+    if target_height <= 0 or target_width <= 0:
+        raise ValueError(f"Invalid target size: ({target_width}, {target_height})")
+
+    resized_img = cp.array(cv2.resize(
+        cp.asnumpy(img),
+        (target_width, target_height),
+        interpolation=cv2.INTER_LINEAR,
+    ).astype(np.float32))
+
+    if len(image.shape) == 3:
+        padded_img[:target_height, :target_width, :] = resized_img
+    else:
+        padded_img[:target_height, :target_width] = resized_img
+
+    padded_img = padded_img[:, :, ::-1] / 255.0  # BGR to RGB and normalize
+
+    if mean is not None:
+        mean_array = cp.array(mean).reshape(1, 1, 3)
+        padded_img -= mean_array
+
+    if std is not None:
+        std_array = cp.array(std).reshape(1, 1, 3)
+        padded_img /= std_array
+
+    padded_img = padded_img.transpose(swap)
+    padded_img = cp.ascontiguousarray(padded_img, dtype=cp.float32)
+    return padded_img, r
 
 class TrainTransform:
     def __init__(self, p=0.5, rgb_means=None, std=None, max_labels=100):
