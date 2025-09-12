@@ -2,6 +2,10 @@
 
 #### This repository contains an optimized version of the YOLOX-Bytetrack algorithm.
 
+This repository began as a fork of the excellent FoundationVision/ByteTrack project, created to develop and contribute GPU-accelerated preprocessing enhancements.
+
+The core optimizations, which involve replacing NumPy with CuPy and implementing multithreading, were submitted back to the original project in Pull Request #402. This repository now serves as a standalone, performance-focused implementation for users seeking maximum preprocessing speed via GPU acceleration.
+
 ## Abstract
 The primary enhancement involves the use of CuPy instead of NumPy for the `preproc` function, resulting in significant performance improvements for the preprocessing stage. The changes also include the utilization of multithreading for parallel processing of multiple images.
 
