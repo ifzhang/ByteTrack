@@ -10,6 +10,7 @@ from loguru import logger
 from yolox.data.data_augment import preproc
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess
+from yolox.utils.scene_context import SceneContextProcessor
 from yolox.utils.visualize import plot_tracking
 from yolox.tracker.byte_tracker import BYTETracker
 from yolox.tracking_utils.timer import Timer
@@ -87,6 +88,47 @@ def make_parser():
     )
     parser.add_argument('--min_box_area', type=float, default=10, help='filter out tiny boxes')
     parser.add_argument("--mot20", dest="mot20", default=False, action="store_true", help="test mot20.")
+    parser.add_argument(
+        "--use_scene_context",
+        action="store_true",
+        help="Enable depth and road context reasoning.",
+    )
+    parser.add_argument(
+        "--road_overlap_thresh",
+        type=float,
+        default=0.5,
+        help="Probability threshold for keeping road-like pixels.",
+    )
+    parser.add_argument(
+        "--depth_stride",
+        type=int,
+        default=1,
+        help="Run depth estimation every N frames (reuse last depth otherwise).",
+    )
+    parser.add_argument(
+        "--segmenter_model",
+        type=str,
+        default="deeplabv3_resnet50",
+        help="Semantic segmenter model name (torchvision).",
+    )
+    parser.add_argument(
+        "--segmenter_path",
+        type=str,
+        default=None,
+        help="Optional TorchScript checkpoint path for the segmenter.",
+    )
+    parser.add_argument(
+        "--depth_model_type",
+        type=str,
+        default="DPT_Hybrid",
+        help="MiDaS depth model variant.",
+    )
+    parser.add_argument(
+        "--depth_model_path",
+        type=str,
+        default=None,
+        help="Optional checkpoint path overriding MiDaS weights.",
+    )
     return parser
 
 
@@ -175,7 +217,7 @@ class Predictor(object):
         return outputs, img_info
 
 
-def image_demo(predictor, vis_folder, current_time, args):
+def image_demo(predictor, vis_folder, current_time, args, scene_context=None):
     if osp.isdir(args.path):
         files = get_image_list(args.path)
     else:
@@ -188,7 +230,17 @@ def image_demo(predictor, vis_folder, current_time, args):
     for frame_id, img_path in enumerate(files, 1):
         outputs, img_info = predictor.inference(img_path, timer)
         if outputs[0] is not None:
-            online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], exp.test_size)
+            context_bundle = None
+            if scene_context is not None:
+                context_bundle = scene_context.process_frame(
+                    img_info["raw_img"], frame_id=frame_id, depth_stride=args.depth_stride
+                )
+            online_targets = tracker.update(
+                outputs[0],
+                [img_info['height'], img_info['width']],
+                exp.test_size,
+                scene_context=context_bundle,
+            )
             online_tlwhs = []
             online_ids = []
             online_scores = []
@@ -233,7 +285,7 @@ def image_demo(predictor, vis_folder, current_time, args):
         logger.info(f"save results to {res_file}")
 
 
-def imageflow_demo(predictor, vis_folder, current_time, args):
+def imageflow_demo(predictor, vis_folder, current_time, args, scene_context=None):
     cap = cv2.VideoCapture(args.path if args.demo == "video" else args.camid)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
@@ -260,7 +312,19 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         if ret_val:
             outputs, img_info = predictor.inference(frame, timer)
             if outputs[0] is not None:
-                online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], exp.test_size)
+                context_bundle = None
+                if scene_context is not None:
+                    context_bundle = scene_context.process_frame(
+                        img_info["raw_img"],
+                        frame_id=frame_id,
+                        depth_stride=args.depth_stride,
+                    )
+                online_targets = tracker.update(
+                    outputs[0],
+                    [img_info['height'], img_info['width']],
+                    exp.test_size,
+                    scene_context=context_bundle,
+                )
                 online_tlwhs = []
                 online_ids = []
                 online_scores = []
@@ -359,10 +423,22 @@ def main(exp, args):
 
     predictor = Predictor(model, exp, trt_file, decoder, args.device, args.fp16)
     current_time = time.localtime()
+    context_processor = None
+    if args.use_scene_context:
+        context_processor = SceneContextProcessor(
+            device=args.device,
+            segmenter_model=args.segmenter_model,
+            segmenter_path=args.segmenter_path,
+            depth_model_type=args.depth_model_type,
+            depth_model_path=args.depth_model_path,
+            road_overlap_thresh=args.road_overlap_thresh,
+        )
     if args.demo == "image":
-        image_demo(predictor, vis_folder, current_time, args)
+        image_demo(predictor, vis_folder, current_time, args, scene_context=context_processor)
     elif args.demo == "video" or args.demo == "webcam":
-        imageflow_demo(predictor, vis_folder, current_time, args)
+        imageflow_demo(
+            predictor, vis_folder, current_time, args, scene_context=context_processor
+        )
 
 
 if __name__ == "__main__":
