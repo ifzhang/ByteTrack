@@ -15,7 +15,9 @@ lap
 motmetrics
 filterpy
 h5py
-
+loguru
+lap
+cython_bbox
 # verified versions
 onnx==1.8.1
 onnxruntime==1.8.0

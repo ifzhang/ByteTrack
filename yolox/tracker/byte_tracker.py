@@ -7,7 +7,7 @@ import torch
 import torch.nn.functional as F
 
 from .kalman_filter import KalmanFilter
-from yolox.tracker import matching
+from ByteTrack.yolox.tracker import matching
 from .basetrack import BaseTrack, TrackState
 
 class STrack(BaseTrack):
@@ -15,7 +15,7 @@ class STrack(BaseTrack):
     def __init__(self, tlwh, score):
 
         # wait activate
-        self._tlwh = np.asarray(tlwh, dtype=np.float)
+        self._tlwh = np.asarray(tlwh, dtype=float)
         self.kalman_filter = None
         self.mean, self.covariance = None, None
         self.is_activated = False
@@ -143,7 +143,7 @@ class STrack(BaseTrack):
 
 
 class BYTETracker(object):
-    def __init__(self, args, frame_rate=30):
+    def __init__(self, args, frame_rate=30, lost_track_buffer_seconds=None):
         self.tracked_stracks = []  # type: list[STrack]
         self.lost_stracks = []  # type: list[STrack]
         self.removed_stracks = []  # type: list[STrack]
@@ -154,10 +154,36 @@ class BYTETracker(object):
         self.det_thresh = args.track_thresh + 0.1
         self.buffer_size = int(frame_rate / 30.0 * args.track_buffer)
         self.max_time_lost = self.buffer_size
+        # Most callers use ByteTrack's original frame-count expiry.  Some
+        # production streams intentionally skip frames, though; for those a
+        # frame-count buffer does not represent a consistent elapsed time.
+        # Keep this opt-in so existing detector pipelines are unchanged.
+        try:
+            self.max_lost_seconds = (
+                max(0.0, float(lost_track_buffer_seconds))
+                if lost_track_buffer_seconds is not None
+                else None
+            )
+        except (TypeError, ValueError):
+            self.max_lost_seconds = None
+        self._lost_since = {}
         self.kalman_filter = KalmanFilter()
 
-    def update(self, output_results, img_info, img_size):
+    def update(self, output_results, img_info, img_size, timestamp=None):
+        """Update tracker state.
+
+        ``timestamp`` is optional and preserves the upstream API when omitted.
+        When an elapsed-time buffer was configured at construction, it lets a
+        frame-skipping caller expire lost tracks by real time instead of by the
+        number of inference calls.
+        """
         self.frame_id += 1
+        use_elapsed_time = self.max_lost_seconds is not None and timestamp is not None
+        if use_elapsed_time:
+            try:
+                current_time = float(timestamp)
+            except (TypeError, ValueError):
+                use_elapsed_time = False
         activated_starcks = []
         refind_stracks = []
         lost_stracks = []
@@ -245,6 +271,8 @@ class BYTETracker(object):
             if not track.state == TrackState.Lost:
                 track.mark_lost()
                 lost_stracks.append(track)
+                if use_elapsed_time:
+                    self._lost_since.setdefault(track.track_id, current_time)
 
         '''Deal with unconfirmed tracks, usually tracks with only one beginning frame'''
         detections = [detections[i] for i in u_detection]
@@ -259,6 +287,7 @@ class BYTETracker(object):
             track = unconfirmed[it]
             track.mark_removed()
             removed_stracks.append(track)
+            self._lost_since.pop(track.track_id, None)
 
         """ Step 4: Init new stracks"""
         for inew in u_detection:
@@ -269,15 +298,23 @@ class BYTETracker(object):
             activated_starcks.append(track)
         """ Step 5: Update state"""
         for track in self.lost_stracks:
-            if self.frame_id - track.end_frame > self.max_time_lost:
+            if use_elapsed_time:
+                lost_at = self._lost_since.setdefault(track.track_id, current_time)
+                expired = current_time - lost_at > self.max_lost_seconds
+            else:
+                expired = self.frame_id - track.end_frame > self.max_time_lost
+            if expired:
                 track.mark_removed()
                 removed_stracks.append(track)
+                self._lost_since.pop(track.track_id, None)
 
         # print('Ramained match {} s'.format(t4-t3))
 
         self.tracked_stracks = [t for t in self.tracked_stracks if t.state == TrackState.Tracked]
         self.tracked_stracks = joint_stracks(self.tracked_stracks, activated_starcks)
         self.tracked_stracks = joint_stracks(self.tracked_stracks, refind_stracks)
+        for track in activated_starcks + refind_stracks:
+            self._lost_since.pop(track.track_id, None)
         self.lost_stracks = sub_stracks(self.lost_stracks, self.tracked_stracks)
         self.lost_stracks.extend(lost_stracks)
         self.lost_stracks = sub_stracks(self.lost_stracks, self.removed_stracks)
