@@ -60,6 +60,14 @@ Step3. Others
 ```shell
 pip3 install cython_bbox
 ```
+
+> If no C++ toolchain is available, `yolox/tracker` now falls back to a pure-numpy
+> `bbox_overlaps` automatically — inference works without a compiler.
+>
+> `lap` note: on platforms where `lap` has no prebuilt wheel, installing the `lapx`
+> distribution satisfies the same import (`pip install lapx` ships a module named
+> `lap`, with the same `lapjv` API), so no code change is needed.
+
 ### 2. Docker build
 ```shell
 docker build -t bytetrack:latest .
